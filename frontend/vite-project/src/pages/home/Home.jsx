@@ -1,14 +1,18 @@
 import React from 'react'
 import Sidebar from '../../components/sidebar/Sidebar'
 import MessageContainer from '../../components/messages/MessageContainer'
+import Header from '../../components/header/Header'
 
 function Home() {
   return (
-    <div className='flex w-[80%] h-[695px] m-auto'>
-        <div className='w-[95%] h-[90%] bg-white m-auto flex'>
+    <div className='w-[100vw] h-[100vh] flex flex-col relative'>
+      <div className='w-[100vw] h-[10vh] bg-slate-300 static top-0'>
+        <Header></Header>
+      </div>
+      <div className='w-[100vw] h-[90vh] bg-white flex'>
         <Sidebar/>
         <MessageContainer/>
-        </div>
+      </div>
     </div>
   )
 }

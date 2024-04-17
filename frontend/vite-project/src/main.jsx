@@ -2,10 +2,14 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
 import './index.css'
-import {BrowserRouter} from 'react-router-dom'
-import Home from './pages/home/Home.jsx'
-import Login from './pages/login/Login.jsx'
-import Signup from './pages/signup/Signup.jsx'
+// import {BrowserRouter} from 'react-router-dom'
+// import Home from './pages/home/Home.jsx'
+// import Login from './pages/login/Login.jsx'
+// import Signup from './pages/signup/Signup.jsx'
+// import { AuthContextProvider } from './context/AuthContext.jsx'
+import { Provider } from 'react-redux'
+import store from './redux/store.js'
+import { CssBaseline } from '@mui/material'
 
 // const router = createBrowserRouter([
 //   {
@@ -25,8 +29,14 @@ import Signup from './pages/signup/Signup.jsx'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <BrowserRouter>
+    <Provider store={store}>
+    {/* <BrowserRouter> */}
+    {/* <AuthContextProvider> */}
+    <CssBaseline>
     <App />   
-    </BrowserRouter>
+    </CssBaseline>
+    {/* </AuthContextProvider> */}
+    {/* </BrowserRouter> */}
+    </Provider>
   </React.StrictMode>,
 )

@@ -11,7 +11,10 @@ module.exports.getMessages = async(req,res) =>{
             participants: { $all : [userId, userToChatID]}
         }).populate("messages");
         
-        if(!conversation) res.status(200).json([]);
+        if(!conversation) {
+            res.status(200).json([]);
+            return
+        }
 
         res.status(200).json(conversation.messages);
 

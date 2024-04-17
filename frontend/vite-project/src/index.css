@@ -6,15 +6,26 @@
 	width: 8px;
 }
 
-::-webkit-scrollbar-track {
+/* ::-webkit-scrollbar-track {
 	background: #555;
-}
+} */
 
 ::-webkit-scrollbar-thumb {
 	background: #d0cccc;
 	border-radius: 5px;
 }
 
-::-webkit-scrollbar-thumb:hover {
+/* ::-webkit-scrollbar-thumb:hover {
 	background: #242424;
+} */
+
+*{
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+html, body{
+	height: 100%;
+	width: 100%;
 }

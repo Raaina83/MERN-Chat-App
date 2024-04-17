@@ -7,14 +7,13 @@ const messageSchema = new Schema({
         ref: "User",
         required: true
     },
-    receiverId: {
+    chat: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
+        ref: "Conversation",
         required: true
     },
     message:{
         type: String,
-        required: true
     }
 
     //createdAt and updatedAt (bcz of timestamps: true)

@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import GenderCheckbox from './GenderCheckbox';
+import useSignup from '../../hooks/useSignup';
 
 function Signup() {
   const [inputs, setInputs] = useState({
@@ -11,14 +12,17 @@ function Signup() {
     email: ""
   })
 
-  const handleSubmit = (e) =>{
-    e.preventDefault();
-    console.log(inputs);
-  }
+  const {loading, signup} = useSignup()
 
   const handleCheckboxChange = (gender) =>{
     setInputs({...inputs, gender})
   }
+
+  const handleSubmit = async(e) =>{
+    e.preventDefault();
+    await signup(inputs);
+  }
+
 
   
   return (
@@ -64,6 +68,7 @@ function Signup() {
                   value={inputs.userName}
                   onChange={(e) => setInputs({...inputs, userName: e.target.value})}
                   type="text"
+                  autoComplete='username'
                   required
                   className="block w-full rounded-md border-0 px-2 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 />
@@ -132,9 +137,12 @@ function Signup() {
             <div>
               <button
                 type="submit"
-                className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6
+                 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 
+                 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                 disabled={loading}
               >
-                Sign up
+                {loading? <span className='loading loading-spinner'></span> : "Sign Up"}
               </button>
             </div>
           </form>
