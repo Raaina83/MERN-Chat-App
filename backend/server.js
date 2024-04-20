@@ -30,7 +30,7 @@ dotenv.config()
 app.use(express.json()); //to parse the incoming request with JSON payloads from req.body
 app.use(cookieParser());
 app.use(cors({
-    origin: ["http://localhost:5173"],
+    origin: ["http://localhost:5173", "http://localhost:5000"], 
     credentials: true
 }))
 

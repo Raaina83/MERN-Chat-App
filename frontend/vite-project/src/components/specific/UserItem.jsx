@@ -3,12 +3,18 @@ import React from 'react'
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 
-function UserItem({user, handler, handlerIsLoading, isAdded}) {
+function UserItem({user, handler, handlerIsLoading, isAdded, styling}) {
     const {fullName, _id, profile} = user
 
   return (
     <ListItem>
-        <Stack direction={"row"} spacing={"2rem"} width={"100%"} alignItems={"center"}>
+        <Stack 
+            direction={"row"} 
+            spacing={"2rem"} 
+            width={"100%"}  
+            alignItems={"center"}
+            {...styling}    
+        >
             <Avatar src={user.profile}/>
 
             <Typography
@@ -30,7 +36,7 @@ function UserItem({user, handler, handlerIsLoading, isAdded}) {
                 bgcolor: isAdded ? "error.main" : "primary.main",
                 color: "white",
                 "&:hover": {
-                    bgcolor:"primary.dark"
+                    bgcolor: isAdded ? "error.main" :"primary.dark"
                 }
             }}
             onClick={() => handler(_id)} disabled={handlerIsLoading}>
