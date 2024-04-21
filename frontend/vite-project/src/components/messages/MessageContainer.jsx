@@ -15,7 +15,7 @@ function MessageContainer() {
   },[])
 
   return (
-    <div className='flex flex-col w-[75%] relative h-[100%]'>
+    <div className='flex flex-col sm:w-[75%] relative h-[100%]  w-[100%]'>
       {!selectedConversation? <NoChatSelected/> : (
         <>
     {/* <MessageHeader conversationUser= {selectedConversation}/> */}

@@ -15,7 +15,7 @@ module.exports.login = async(req,res) =>{
 
         generateTokenAndCookie(user._id, res);
 
-        res.status(200).json({
+        return res.status(200).json({
             _id: user._id,
             userName: user.userName,
             fullName: user.fullName,
@@ -23,7 +23,7 @@ module.exports.login = async(req,res) =>{
         })
     } catch (error) {
         console.log("Error in login controller", error)
-        res.status(500).json({error: "Internal server Error"})
+        return res.status(500).json({error: "Internal server Error"})
     }
 }
 
@@ -63,27 +63,27 @@ module.exports.signup = async(req,res) =>{
             generateTokenAndCookie(newUser._id, res);
             await newUser.save();
 
-        res.status(201).json({
+        return res.status(201).json({
             _id: newUser._id,
             userName: newUser.userName,
             gender: newUser.gender,
             profile: newUser.profile
         });
         } else{
-            res.status(400).json("Invalid data")
+            return res.status(400).json("Invalid data")
         }
     } catch (error) {
         console.log("Error in signup controller", error)
-        res.status(500).json({error: "Internal server Error"})
+        return res.status(500).json({error: "Internal server Error"})
     }
 }
 
 module.exports.logout = (req,res) =>{
     try {
         res.cookie("jwt", "", {maxAge: 0});
-        res.status(200).json("Logged out successfully")
+        return res.status(200).json("Logged out successfully")
     } catch (error) {
         console.log("Error in logout controller", error)
-        res.status(500).json({error: "Internal server Error"})
+        return res.status(500).json({error: "Internal server Error"})
     }
 }

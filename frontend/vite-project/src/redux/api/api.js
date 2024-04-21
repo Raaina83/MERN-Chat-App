@@ -2,8 +2,8 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 const api = createApi({
     reducerPath: "api",
-    baseQuery: fetchBaseQuery({baseUrl: 'https://localhost:5000/api/v1/'}), //by default has the behaviour of caching hence we need to provide tags so later when we are just getting cached data we can refecth when changes in data occur
-    tagTypes: ["Chat"],
+    baseQuery: fetchBaseQuery({baseUrl: 'http://localhost:5000/api/v1/'}), //by default has the behaviour of caching hence we need to provide tags so later when we are just getting cached data we can refecth when changes in data occur
+    tagTypes: ["Chat", "User"],
     endpoints: (builder) => ({
         myChats: builder.query({
             query: () => ({
@@ -11,10 +11,49 @@ const api = createApi({
              credentials: 'include'  
             }),
             providesTags: ['Chat']
+        }), 
+        searchUser: builder.query({
+            query: (name) => ({
+                url: `users/search?name=${name}`,
+                credentials: "include"
+            }),
+            providesTags: ['User']
         }),
-        invalidateTags: ['Chat']
-    })
+        sendFriendRequest: builder.mutation({
+            query: (data) => ({
+                url: `users/sendrequest`,
+                method: "PUT",
+                credentials: 'include',
+                body: data
+            }),
+            invalidatesTags: ["User"]
+        }),
+        getNotifications: builder.query({
+            query: () => ({
+                url: `users/notifications`,
+                credentials: "include"
+            }),
+            keepUnusedDataFor: 0
+        }),
+        acceptFriendRequest: builder.mutation({
+            query: (data) => ({
+                url: `users/acceptrequest`,
+                method: "PUT",
+                credentials: 'include',
+                body: data
+            }),
+            invalidatesTags: ["Chat"]
+        }),
+        
+        // invalidateTags: ['Chat']
+    }),
 })
 
 export default api;
-export const {useMyChatsQuery} = api
+export const {
+    useMyChatsQuery, 
+    useLazySearchUserQuery, 
+    useSendFriendRequestMutation, 
+    useGetNotificationsQuery, 
+    useAcceptFriendRequestMutation
+} = api

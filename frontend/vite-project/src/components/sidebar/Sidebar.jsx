@@ -5,9 +5,9 @@ import LogoutBtn from './LogoutBtn'
 
 function Sidebar() {
   return (
-    <div className=' w-[25%] h-[100%] bg-gray-200 ' id='sidebar'>
+    <div className='hidden sm:w-[25%] sm:h-[100%] bg-gray-200 sm:block' id='sidebar'>
         {/* <SearchInput/> */}
-        <ConversationBox/>
+        <ConversationBox />
         {/* <LogoutBtn/> */}
     </div>
   )

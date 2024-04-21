@@ -63,7 +63,7 @@ module.exports.getMyChat = async(req, res) => {
 
         return res.status(200).json({
           success: true,
-          transformedConversations  
+          chats: transformedConversations  
         })
     } catch (error) {
         console.log("Error in getMyChat middleware", error)

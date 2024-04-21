@@ -4,16 +4,40 @@ import DialogTitle from '@mui/material/DialogTitle';
 import { InputAdornment, List, ListItem, ListItemText, Stack, TextField } from '@mui/material';
 import { FaSearch } from "react-icons/fa";
 import UserItem from './UserItem';
-import { sampleData } from '../../constants/sampleData';
+import { useDispatch, useSelector } from 'react-redux';
+import { setIsSearch } from '../../redux/reducers/misc';
+import { useLazySearchUserQuery, useSendFriendRequestMutation } from '../../redux/api/api';
+import { useEffect } from 'react';
+import {toast} from 'react-hot-toast'
+import { useAsyncMutationHook } from '../../hooks/hooks';
 
 export default function SearchDialog() {
+  const {isSearch} = useSelector((state) => state.misc)
+  const [searchUser] = useLazySearchUserQuery()
+  const [sendFriendRequest, isLoadingFriendReq, data] = useAsyncMutationHook(useSendFriendRequestMutation)
+
   const [open, setOpen] = React.useState(false);
   const [search, setSearch] = React.useState("")
-  const [users, setUsers] = React.useState(sampleData)
-  const addFriendHandler = (id) => {
-    console.log(id)
+  const [users, setUsers] = React.useState([])
+  const dispatch = useDispatch()
+  const addFriendHandler = async(id) => {
+    await sendFriendRequest("Sending Friend Request", { userId: id })
+    
   }
-  const isLoadingFriendReq = false
+  const searchInputHandler =(e) => {setSearch(e.target.value)}
+  const searchCloseHandler = () => dispatch(setIsSearch(false))
+
+  useEffect(() => {
+    const timeOutId = setTimeout(() => {
+      searchUser(search)
+        .then(({data}) => setUsers(data.users))
+        .catch((e) => console.log(e))
+    }, 1000)
+
+    return () => {
+      clearTimeout(timeOutId)
+    }
+  }, [search])
 
   return (
     <>
@@ -21,7 +45,8 @@ export default function SearchDialog() {
         Open alert dialog
       </Button> */}
       <Dialog
-        open
+        open={isSearch}
+        onClose={searchCloseHandler}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
@@ -34,6 +59,7 @@ export default function SearchDialog() {
         value={search}
         variant='outlined'
         size='small'
+        onChange={searchInputHandler}
         InputProps={{
           startAdornment: (
             <InputAdornment position='start'>

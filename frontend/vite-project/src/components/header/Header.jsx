@@ -8,39 +8,44 @@ import useLogout from '../../hooks/useLogout';
 import { FaBars } from "react-icons/fa6";
 import { useNavigate } from 'react-router-dom';
 import SearchDialog from '../specific/SearchDialog';
-import { Backdrop } from '@mui/material';
+import { Backdrop, IconButton } from '@mui/material';
 import Notification from './Notification'
 import NewGroup from './NewGroup';
+import { setIsMobileMenu, setIsNotification, setIsSearch } from '../../redux/reducers/misc';
+import { useDispatch, useSelector } from 'react-redux';
 
 
 function Header() {
+  const {isSearch, isNotification} = useSelector((state) => state.misc)
   const {loading, logout}  = useLogout()
   const navigate = useNavigate()
-  const [isSearch, setIsSearch] = useState(false)
-  const [isNotification, setIsNotification] = useState(false)
+  // const [isNotification, setIsNotification] = useState(false)
   const [isNewGroup, setIsNewGroup] = useState(false)
+  const dispatch = useDispatch()
 
-  const openSearch = () => {
-    setIsSearch((prev) => !prev)
-  }
+  const openSearch = () => dispatch(setIsSearch(true))
+ 
 
-  const openNotification = () => {
-    setIsNotification((prev) => !prev)
-  }
+  const openNotification = () => dispatch(setIsNotification(true))
 
   const openNewGroup = () => {
     setIsNewGroup((prev) => !prev)
   }
+  const handleMobile = () => dispatch(setIsMobileMenu(true))
+ 
 
   const navigateToGroup = () => navigate("/group")
+
 
   return (
     <div className='h-[10vh] flex items-center justify-center '>
       <div className='w-[50%] h-[10vh] text-xl hidden font-medium sm:flex items-center justify-start ms-8'>
       Chat App
       </div>
-      <div className='flex sm:hidden justify-start w-[50%] h-[10vh] items-center px-4'>
-        <FaBars className=' size-6 cursor-pointer'/>
+      <div className='flex sm:hidden justify-start w-[50%] h-[10vh] items-center px-4 '>
+        <IconButton onClick={handleMobile}>
+        <FaBars className=' size-6 cursor-pointer' />
+        </IconButton>
       </div>
       <div className='w-[50%] h-[10vh]'>
         <div className='flex justify-end items-center h-[100%]'>
