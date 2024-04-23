@@ -3,18 +3,18 @@ import {BsSend} from 'react-icons/bs'
 import useSendMessages from '../../hooks/useSendMessages'
 import { RiAttachment2 } from "react-icons/ri";
 
-function MessageInput() {
-  const [message, setMessage] = useState("")
+function MessageInput({value, handler, handleSubmit}) {
+  // const [message, setMessage] = useState("")
   const {loading, sendMessage} = useSendMessages();
 
-  const handleSubmit = async(e) =>{
-    e.preventDefault();
-    if(!message) return
-    console.log(message)
-    await sendMessage(message);
+  // const handleSubmit = async(e) =>{
+  //   e.preventDefault();
+  //   if(!message) return
+  //   console.log(message)
+  //   await sendMessage(message);
 
-    setMessage("");
-  }
+  //   setMessage("");
+  // }
 
   return (
     <form className='flex bg-slate-100 p-4 absolute w-full h-[15%] bottom-0' onSubmit={handleSubmit}>
@@ -24,8 +24,9 @@ function MessageInput() {
         type='text'
         placeholder='Send a message'
         className=' rounded-md p-2 w-full ps-[4rem]'
-        value={message}
-        onChange={(e) => setMessage(e.target.value)}/>
+        value={value}
+        // onChange={(e) => setMessage(e.target.value)}
+        onChange={handler}/>
         <button className=' absolute inset-y-0 end-4' type='submit'>
             {loading? <span className='loading loading-spinner'></span> : <BsSend/>}
         </button>

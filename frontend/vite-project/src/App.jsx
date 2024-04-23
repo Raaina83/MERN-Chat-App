@@ -6,6 +6,8 @@ import {Toaster} from "react-hot-toast"
 import { useAuthContext } from "./context/AuthContext"
 import { useSelector } from "react-redux"
 import Group from "./pages/group/Group"
+import { SocketProvider } from "./socket"
+import ProtectRoute from "./components/auth/ProtectRoute"
 
 function App() {
   // const {authUser} = useAuthContext()
@@ -14,10 +16,24 @@ function App() {
   return (
     <BrowserRouter>
     <Routes>
-    <Route path="/" element={user? <Home/>: <Navigate to={"/login"}/>}></Route>
-    <Route path="/login" element={user? <Navigate to="/"/> :<Login/>}></Route>
+      <Route element={
+        <SocketProvider>
+          <ProtectRoute user={user}/>
+        </SocketProvider>
+      }>
+        <Route path="/" element={ <Home/>}></Route>
+        <Route path="/group" element={<Group></Group>}></Route>
+      </Route>
+
+      <Route
+            path="/login"
+            element={
+              <ProtectRoute user={!user} redirect="/">
+                <Login />
+              </ProtectRoute>
+            }
+          />
     <Route path="/signup" element={user? <Navigate to="/"/> : <Signup/>}></Route>
-    <Route path="/group" element={<Group></Group>}></Route>
     </Routes>
     <Toaster/>
     </BrowserRouter>

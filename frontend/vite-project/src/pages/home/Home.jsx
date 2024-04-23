@@ -9,13 +9,25 @@ import { Drawer } from '@mui/material'
 import ConversationBox from '../../components/sidebar/ConversationBox'
 import {useMyChatsQuery} from '../../redux/api/api'
 import {useErrors} from '../../hooks/hooks'
+import { getSocket } from '../../socket'
+import { useParams } from 'react-router-dom'
 
 
 function Home() {
+  // const params = useParams()
+  // const chatId = params.chatId
+  // console.log("params",params)
+  // console.log("chatId", chatId)
+
+  const socket = getSocket()
+
+  console.log("socket-->", socket.id)
+
   const {isMobileMenu} = useSelector((state) => state.misc)
   const {isLoading,data,isError,error,refetch} = useMyChatsQuery("")
   const dispatch = useDispatch()
 
+  // console.log("Home data chats--->", data)
   const handleMobileClose = () => dispatch(setIsMobileMenu(false))
 
   useErrors([{isError, error}])

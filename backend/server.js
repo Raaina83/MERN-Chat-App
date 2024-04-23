@@ -13,12 +13,18 @@ const conversation = require("./routes/conversation.js")
 const connectToMongoDB = require("./db/connectToMongodb.js");
 const app = express();
 const server = createServer(app)
-const io = new Server(server, {})
+const io = new Server(server, {
+    cors:  ({
+        origin: ["http://localhost:5173"], 
+        credentials: true
+    })
+})
 
 const cookieParser = require("cookie-parser");
 const { NEW_MESSAGE, NEW_MESSAGE_ALERT } = require('./constants/events.js')
-const { getSockets } = require('./lib/helper.js')
+// const { getSockets } = require('./lib/getSocket.js')
 const Message = require('./models/message.model.js')
+const { socketAuthenticator } = require('./middleware/socketAuthenticator.js')
 // const { createSingleChats, createMessages } = require('./seeders/chats.seeder.js')
 const PORT = process.env.PORT || 5000
 const userSocketIDs = new Map() //all the active users connected
@@ -40,17 +46,20 @@ app.use("/api/v1/messages", message)
 app.use("/api/v1/users", user)
 app.use("/api/v1/chat", conversation)
 
-io.use((socket, next) => {})
+io.use((socket, next) => {
+    cookieParser()(
+        socket.request, 
+        socket.request.res, 
+        async (err) => {
+        await socketAuthenticator(err, socket, next)
+    })
+})
 
 io.on("connection", (socket) => {
-    const user = {
-        _id: "djh",
-        fullName: "Manya"
-    }
+    const user = socket.user
+    // console.log(user)
 
     userSocketIDs.set(user._id.toString(), socket.id)
-
-    console.log("user connected", socket.id)
 
     socket.on(NEW_MESSAGE, async({chatId, participants, message}) => {
         const messageRealTime = {
@@ -70,6 +79,7 @@ io.on("connection", (socket) => {
             chat: chatId
         }
 
+        console.log("emitting", messageRealTime)
         const usersSocket = getSockets(participants)
         io.to(usersSocket).emit(NEW_MESSAGE, {
             chatId,
@@ -96,4 +106,11 @@ server.listen(PORT,() =>{
     console.log(`App is listening on port ${PORT}`)
 })
 
-module.exports = userSocketIDs
+const getSockets = (users = []) => {
+    const sockets = users.map((user) => userSocketIDs.get(user.toString()))
+
+    return sockets
+}
+
+
+// module.exports = {userSocketIDs}

@@ -2,6 +2,7 @@ import React from 'react'
 import { useAuthContext } from '../../context/AuthContext'
 import useConversation from '../../zustand/useConversation'
 import { extractTime } from '../../utils/extractTime';
+import { useParams } from 'react-router-dom';
 
 function Message({message}) {
     const {authUser}  = useAuthContext();
@@ -11,6 +12,9 @@ function Message({message}) {
     const chatClassName = fromMe ? "chat-end" : "chat-start";
     const profilePic = fromMe ? authUser.profile : selectedConversation.profile; 
     const name = fromMe ? authUser.fullName : selectedConversation.fullname;
+
+    // const params = useParams()
+    // console.log("params message", params)
 
   return (
     <>

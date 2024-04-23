@@ -1,12 +1,17 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import Message from './Message'
 import useGetMessages from '../../hooks/useGetMessages'
 import MessageSkeleton from '../skeletons/MessageSkeleton';
+import { getSocket } from '../../socket';
 
 
 function MessageBox() {
   const {messages, loading}  = useGetMessages()
   const lastMessageRef = useRef();
+
+  const socket = getSocket()
+
+  const [message, setMessage] = useState("")
 
   useEffect(() =>{
     setTimeout(() =>{

@@ -1,5 +1,6 @@
 import React from 'react'
 import useConversation from '../../zustand/useConversation'
+import { useParams } from 'react-router-dom'
 
 
 function Conversation({conversation}) {

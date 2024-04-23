@@ -5,7 +5,6 @@ import {useMyChatsQuery} from '../../redux/api/api'
 
 function ConversationBox() {
   const {isLoading,data,isError,error,refetch} = useMyChatsQuery("")
-  console.log("data-->", data)
   // const {loading, conversations} = useGetConversations()
   return (
     <div id='conversation-box' className='h-[90%] overflow-auto'>

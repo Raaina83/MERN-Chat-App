@@ -199,8 +199,10 @@ module.exports.getChatDetails = async(req,res) => {
     try {
         if(req.query.populate === "true"){
             const chatId = req.params.id
-            const chat = await Conversation.findById(chatId).populate("participants", "fullName profile")
+            console.log("chatId", chatId)
 
+            const chat = await Conversation.findById(chatId).populate("participants", "fullName profile")
+            
             if(!chat){
                 throw new Error("Chat not found")
             }
@@ -211,6 +213,7 @@ module.exports.getChatDetails = async(req,res) => {
             })
         } else{
             const chatId = req.params.id
+            console.log("chatId", chatId)
             const chat = await Conversation.findById(chatId)
 
             if(!chat){
