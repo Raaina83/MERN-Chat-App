@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import MessageHeader from './MessageHeader'
 import MessageBox from './MessageBox'
 import MessageInput from './MessageInput'
@@ -7,6 +7,7 @@ import useConversation from '../../zustand/useConversation'
 import { getSocket } from '../../socket';
 import { NEW_MESSAGE } from '../../constants/events'
 import { useChatDetailsQuery } from '../../redux/api/api'
+import { useSocketEvents } from '../../hooks/hooks'
 
 function MessageContainer({}) {
   const {selectedConversation, setSelectedConversation} = useConversation()
@@ -36,11 +37,16 @@ function MessageContainer({}) {
     console.log(message)
   }
 
-  useEffect(() =>{
-
-    //cleanup function(unmounting)
-    return () => setSelectedConversation(null)
-  },[])
+  if(selectedConversation){
+    const newMessageHandler = useCallback((data) => {
+      console.log(data)
+    })
+  
+    const eventArr = { [NEW_MESSAGE]: newMessageHandler}
+  
+    // useSocketEvents(socket, eventArr)
+    
+  }
 
   return chatDetails?.isLoading? (<span className=' loading loading-spinner'></span>) : (
     <div className='flex flex-col sm:w-[75%] relative h-[100%]  w-[100%]'>

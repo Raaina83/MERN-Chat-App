@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
+import useConversation from '../zustand/useConversation'
 
 const useErrors = (errors = []) => {
     useEffect(() => {
@@ -47,5 +48,23 @@ const useAsyncMutationHook = (mutationHook) => {
     return [executeMutation, isLoading, data]
 }
 
+const useSocketEvents = (socket, handlers) => {
+  const {setSelectedConversation} = useConversation()
+  useEffect(() =>{
+    Object.entries(handlers).forEach((a) => {
+      // socket.on(event, handler)
+      // console.log("a-->", a)
+    })
 
-export  {useErrors, useAsyncMutationHook}
+    //cleanup function(unmounting)
+    return () => {
+      Object.entries(handlers).forEach(([event, handler]) => {
+        socket.off(event, handler)
+      })
+      setSelectedConversation(null)
+    }
+  },[socket, handlers])
+}
+
+
+export  {useErrors, useAsyncMutationHook, useSocketEvents}

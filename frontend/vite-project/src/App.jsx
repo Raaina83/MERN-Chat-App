@@ -8,6 +8,7 @@ import { useSelector } from "react-redux"
 import Group from "./pages/group/Group"
 import { SocketProvider } from "./socket"
 import ProtectRoute from "./components/auth/ProtectRoute"
+import Chat from "./pages/chat/Chat"
 
 function App() {
   // const {authUser} = useAuthContext()
@@ -22,6 +23,7 @@ function App() {
         </SocketProvider>
       }>
         <Route path="/" element={ <Home/>}></Route>
+        <Route path="/chat/:chatId" element={<Chat />} />
         <Route path="/group" element={<Group></Group>}></Route>
       </Route>
 

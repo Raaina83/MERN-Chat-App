@@ -1,20 +1,47 @@
 import React from 'react'
-// import useGetConversations from '../../hooks/useGetConversations'
 import Conversation from './Conversation'
 import {useMyChatsQuery} from '../../redux/api/api'
+import ChatItem from '../shared/ChatItem'
 
-function ConversationBox() {
-  const {isLoading,data,isError,error,refetch} = useMyChatsQuery("")
+function ConversationBox({
+  chats = [],
+  chatId,
+  onlineUsers = [],
+  newMessagesAlert = [
+    {
+      chatId: "",
+      count: 0
+    },
+  ],
+  handleDeleteChat
+}) {
+  console.log("chats-->", chats)
   // const {loading, conversations} = useGetConversations()
   return (
     <div id='conversation-box' className='h-[90%] overflow-auto'>
-      {isLoading ? (<span className=' loading-spinner'></span>) : (
-      data?.chats.map((conversation) => (
-      <Conversation 
-      key={conversation._id}
-      conversation= {conversation}/>
-    ))
-    )}
+      { chats?.map((data, index) =>{
+        console.log("data-->",data)
+        // const {profile, _id, name, groupChat, participants} = data
+        // console.log(name)
+
+        const newMessageAlert  = newMessagesAlert.find(
+          ({chatId}) => chatId === data._id
+        )
+
+        const isOnline = data.participants.some((member) => onlineUsers.includes(member))
+
+        return (<ChatItem 
+          name= {data.name[0]}
+          _id= {data._id}
+          groupChat= {data.groupChat}
+          newMessageAlert= {newMessageAlert}
+          isOnline= {isOnline}
+          index= {index}
+          key={data._id}
+          sameSender ={chatId === data._id}
+          handleDeleteChatOpen={handleDeleteChat}
+        />)
+      })}
   </div>
   )
 }
