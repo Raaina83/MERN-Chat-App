@@ -17,13 +17,13 @@ function MessageInput({value, handler, handleSubmit}) {
   // }
 
   return (
-    <form className='flex bg-slate-100 p-4 absolute w-full h-[15%] bottom-0' onSubmit={handleSubmit}>
+    <form className='flex bg-slate-100 p-4 absolute w-[60%] h-[10%] bottom-0' onSubmit={handleSubmit}>
         <div className='w-[70%] relative m-auto flex justify-center items-center'>
           <button className='absolute start-4'><RiAttachment2/></button>
         <input
         type='text'
         placeholder='Send a message'
-        className=' rounded-md p-2 w-full ps-[4rem]'
+        className=' rounded-md p-2 w-full ps-[4rem] text-white'
         value={value}
         // onChange={(e) => setMessage(e.target.value)}
         onChange={handler}/>

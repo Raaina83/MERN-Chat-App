@@ -40,7 +40,7 @@ function Login() {
                   type="text"
                   required
                   onChange={(e) => setUsername(e.target.value)}
-                  className="block w-full rounded-md border-0 px-2 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset
+                  className="block w-full rounded-md border-0 px-2 py-1.5 text-white shadow-sm ring-1 ring-inset
                    ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 
                    sm:text-sm sm:leading-6"
                 />
@@ -49,7 +49,7 @@ function Login() {
 
             <div>
               <div className="flex items-center justify-between">
-                <label htmlFor="password" className="block text-sm font-medium leading-6 text-gray-900">
+                <label htmlFor="password" className="block text-sm font-medium leading-6 text-white">
                   Password
                 </label>
                 <div className="text-sm">

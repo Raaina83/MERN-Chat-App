@@ -15,12 +15,9 @@ function ConversationBox({
   ],
   handleDeleteChat
 }) {
-  console.log("chats-->", chats)
-  // const {loading, conversations} = useGetConversations()
   return (
-    <div id='conversation-box' className='h-[90%] overflow-auto'>
+    <div id='conversation-box' className='h-[100%] overflow-auto'>
       { chats?.map((data, index) =>{
-        console.log("data-->",data)
         // const {profile, _id, name, groupChat, participants} = data
         // console.log(name)
 
@@ -34,12 +31,13 @@ function ConversationBox({
           name= {data.name[0]}
           _id= {data._id}
           groupChat= {data.groupChat}
+          profile= {data.profile}
           newMessageAlert= {newMessageAlert}
           isOnline= {isOnline}
           index= {index}
           key={data._id}
           sameSender ={chatId === data._id}
-          handleDeleteChatOpen={handleDeleteChat}
+          handleDeleteChat={handleDeleteChat}
         />)
       })}
   </div>

@@ -11,6 +11,7 @@ import ConversationBox from '../sidebar/ConversationBox'
 const AppLayout = () => (WrappedComponent) => {
     return (props) => {
         const params = useParams()
+        console.log("params-->",params)
         const chatId = params.chatId
 
         const {isMobileMenu} = useSelector((state) => state.misc)
@@ -19,34 +20,57 @@ const AppLayout = () => (WrappedComponent) => {
 
         const handleMobileClose = () => dispatch(setIsMobileMenu(false))
 
+        const handleDeleteChat = (e, _id, groupChat) => {
+            e.preventDefault()
+            console.log("Delete Chat", _id, groupChat)
+        }
+
         useErrors([{isError, error}])
 
         return (
-        <div className='w-[100vw] h-[100vh] flex flex-col relative'>
-            <div className='w-[100vw] h-[10vh] bg-slate-300 static top-0'>
-                <Header></Header>
-            </div>
+        <div className=' h-[100vh] w-[100vw]'>
+            <Header></Header>
 
-            <Grid>
-                <Grid height={"90vh"}>
-                    <Drawer open={isMobileMenu} onClose={handleMobileClose}>
-                        {isLoading ? (
-                        <span className=' loading loading-spinner'></span>
-                        ) :( 
-                        <ConversationBox chats={data?.chats}></ConversationBox>
-                        )}
-                    </Drawer>
+            <Drawer open={isMobileMenu} onClose={handleMobileClose}>
+                {isLoading ? (
+                <span className=' loading loading-spinner'></span>
+                ) :( 
+                <ConversationBox 
+                chats={data?.chats}
+                chatId={chatId}/>
+                )}
+            </Drawer>
+
+            <Grid container
+            height={"90vh"}
+            width={"100%"}
+            >
+                <Grid
+                height={"100%"}
+                item
+                sm={4}
+                
+                sx={{
+                    display: {xs: "none", sm: "block"}
+                }}>
+                    {isLoading ? <span className=' loading loading-spinner'></span> : (
+                        <ConversationBox 
+                        chats={data?.chats}
+                        chatId={chatId}
+                        handleDeleteChat={handleDeleteChat}/>
+                    )}
                 </Grid>
 
-                <Grid item xs={12} sm={8} md={5} lg={6} height={"100%"}>
+                <Grid item xs={12} sm={8} height={"100%"} >
                     <WrappedComponent {...props} chatId={chatId}  />
                 </Grid>
                 
 
-                {/* <div className='w-[100vw] h-[90vh] bg-white flex' >
-                    <Sidebar className='hidden sm:flex' />
-                    <MessageContainer/>
-                </div> */}
+                {/* <Grid>
+                <div className='w-[100vw] h-[90vh] bg-white flex' >
+                    <ConversationBox chats={data?.chats}></ConversationBox>
+                </div>
+                </Grid> */}
             </Grid>
             
         </div>

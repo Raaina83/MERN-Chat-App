@@ -49,10 +49,9 @@ const useAsyncMutationHook = (mutationHook) => {
 }
 
 const useSocketEvents = (socket, handlers) => {
-  const {setSelectedConversation} = useConversation()
   useEffect(() =>{
-    Object.entries(handlers).forEach((a) => {
-      // socket.on(event, handler)
+    Object.entries(handlers).forEach(([event, handler]) => {
+      socket.on(event, handler)
       // console.log("a-->", a)
     })
 
@@ -61,7 +60,6 @@ const useSocketEvents = (socket, handlers) => {
       Object.entries(handlers).forEach(([event, handler]) => {
         socket.off(event, handler)
       })
-      setSelectedConversation(null)
     }
   },[socket, handlers])
 }

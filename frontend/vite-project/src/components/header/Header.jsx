@@ -38,7 +38,7 @@ function Header() {
 
 
   return (
-    <div className='h-[10vh] flex items-center justify-center '>
+    <div className='h-[10vh] flex items-center justify-center w-[100%] bg-slate-100'>
       <div className='w-[50%] h-[10vh] text-xl hidden font-medium sm:flex items-center justify-start ms-8'>
       Chat App
       </div>

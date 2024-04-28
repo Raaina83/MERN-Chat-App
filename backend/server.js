@@ -25,6 +25,7 @@ const { NEW_MESSAGE, NEW_MESSAGE_ALERT } = require('./constants/events.js')
 // const { getSockets } = require('./lib/getSocket.js')
 const Message = require('./models/message.model.js')
 const { socketAuthenticator } = require('./middleware/socketAuthenticator.js')
+const { profile } = require('console')
 // const { createSingleChats, createMessages } = require('./seeders/chats.seeder.js')
 const PORT = process.env.PORT || 5000
 const userSocketIDs = new Map() //all the active users connected
@@ -67,7 +68,8 @@ io.on("connection", (socket) => {
             _id: v4(),
             senderId: {
                 _id: user._id,
-                fullName: user.fullName
+                fullName: user.fullName,
+                profile: user.profile
             },
             chat: chatId,
             createdAt: new Date().toISOString()
