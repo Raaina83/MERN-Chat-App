@@ -1,27 +1,41 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import AppLayout from '../../components/layout/AppLayout'
-import MessageInput from '../../components/messages/MessageInput.jsx'
 import Message from '../../components/messages/Message.jsx'
-import { Skeleton, Stack } from '@mui/material'
+import { Skeleton, Stack, Typography } from '@mui/material'
 import { RiAttachment2 } from "react-icons/ri";
 import {BsSend} from 'react-icons/bs'
-import useSendMessages from '../../hooks/useSendMessages.js'
 import { getSocket } from '../../socket.jsx'
 import { NEW_MESSAGE } from '../../constants/events.js'
-import { useChatDetailsQuery } from '../../redux/api/api.js'
-import { useSocketEvents } from '../../hooks/hooks.jsx'
-import useConversation from '../../zustand/useConversation.js'
+import { useChatDetailsQuery, useGetAllMessagesQuery } from '../../redux/api/api.js'
+import { useErrors, useSocketEvents } from '../../hooks/hooks.jsx'
+import {useInfiniteScrollTop} from '6pp'
 
 const Chat= ({chatId}) => {
   const containerRef = useRef(null)
-
   const socket = getSocket()
 
   const [message, setMessage] = useState("")
   const [messages, setMessages] = useState("")
-  console.log("messages-->",messages)
+  const [page, setPage] = useState(1)
 
   const chatDetails =  useChatDetailsQuery({chatId, skip: !chatId})
+
+  const oldMessagesChunk = useGetAllMessagesQuery({chatId, page}) 
+
+  const {data: oldMessages, setData: setOldMessages} = useInfiniteScrollTop(
+    containerRef,
+    oldMessagesChunk?.data?.totalPages,
+    page,
+    setPage,
+    oldMessagesChunk?.data?.messages
+  )
+
+  const errors = [
+    {isError: chatDetails.isError,
+    error: chatDetails.error},
+    {isError: oldMessagesChunk.isError,
+    error: oldMessagesChunk.error}
+  ]
 
   const participants = chatDetails?.data?.chat?.participants
 
@@ -35,19 +49,31 @@ const Chat= ({chatId}) => {
   }
 
   const newMessagesHandler = useCallback((data) => {
-    console.log("socket data-->",data)
     setMessages((prev) => [...prev, data.message])
   }, [])
+
+  console.log("oldmessages", oldMessages)
 
   const eventHandler = {[NEW_MESSAGE] : newMessagesHandler}
 
   useSocketEvents(socket, eventHandler)
 
+  useErrors(errors)
+
+  const allMessages = [...oldMessages, ...messages]
+
 
   return chatDetails.isLoading ? (<Skeleton></Skeleton>) : (
     <>
-    <Stack ref={containerRef}>
-      {messages.length > 0 && messages.map((message) => <Message message={message} key={message._id}/>)}
+    <Stack ref={containerRef} overflow={"auto"} height={"90%"}>
+      {/* {!oldMessagesChunk.isLoading && oldMessagesChunk?.data?.messages?.map((message) => <Message message={message} key={message._id}/>)} */}
+
+      {allMessages.length > 0 ? (
+        allMessages.map((message) => <Message message={message} key={message._id}/>)
+        ) : (
+        <Typography textAlign={"center"} padding={"1rem"}>Send a Message to start conversation</Typography>
+        )}
+
     </Stack>
 
 

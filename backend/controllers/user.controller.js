@@ -1,7 +1,9 @@
 const User = require("../models/user.model.js");
 const Conversation = require("../models/conversation.model.js");
 const Request = require("../models/request.model.js");
-const {getOtherMembers} = require("../lib/helper.js")
+const {getOtherMembers} = require("../lib/helper.js");
+const { emitEvent } = require("../utils/features.js");
+const { NEW_REQUEST } = require("../constants/events.js");
 
 
 module.exports.getUsersForSidebar = async(req,res) =>{
@@ -65,6 +67,8 @@ module.exports.sendFriendRequest = async(req, res) => {
             senderId: req.user._id,
             receiverId: userId
         })
+
+        emitEvent(req, NEW_REQUEST, [userId])
 
         return res.status(200).json({
             success: true,

@@ -316,7 +316,7 @@ module.exports.getMessages = async(req,res) => {
                 .sort({ createdAt: -1 })
                 .skip(skip)
                 .limit(resultPerPage)
-                .populate("senderId", "fullName, profile")
+                .populate("senderId", "fullName profile")
                 .lean(),
             Message.countDocuments({ chat: chatId })
         ])

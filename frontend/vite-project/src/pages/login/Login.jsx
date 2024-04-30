@@ -1,17 +1,31 @@
-import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
+import React, { useEffect, useState } from 'react'
+import { Link, Navigate } from 'react-router-dom'
 import useLogin from "../../hooks/useLogin.js"
+import toast from 'react-hot-toast';
+import axios from 'axios';
+import { useDispatch } from 'react-redux';
+import { userExists, userNotExists } from '../../redux/reducers/auth.js';
 
 function Login() {
   const [userName, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const dispatch = useDispatch()
 
   const {loading, login} = useLogin();
 
   const handleSubmit = async(e) =>{
     e.preventDefault();
+
     login(userName, password)
   }
+
+  useEffect(() => {
+    const loggedInUser = localStorage.getItem("chat-user")
+    if(loggedInUser) {
+      const user = JSON.parse(loggedInUser)
+      dispatch(userExists(user))
+    }
+  }, [])
 
   return (
     <>

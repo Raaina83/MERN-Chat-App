@@ -31,7 +31,7 @@ const useLogin = () =>{
 
             dispatch(userExists(data))
             console.log(data)
-            // localStorage.setItem("chat-user", JSON.stringify(data))
+            localStorage.setItem("chat-user", JSON.stringify(data))
             // setAuthUser(data)
             toast.success("Logged in successfully")
 

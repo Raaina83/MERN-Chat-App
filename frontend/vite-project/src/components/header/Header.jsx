@@ -8,18 +8,21 @@ import useLogout from '../../hooks/useLogout';
 import { FaBars } from "react-icons/fa6";
 import { useNavigate } from 'react-router-dom';
 import SearchDialog from '../specific/SearchDialog';
-import { Backdrop, IconButton } from '@mui/material';
+import { Backdrop, Badge, IconButton, Tooltip } from '@mui/material';
 import Notification from './Notification'
 import NewGroup from './NewGroup';
 import { setIsMobileMenu, setIsNotification, setIsSearch } from '../../redux/reducers/misc';
 import { useDispatch, useSelector } from 'react-redux';
+import NotificationsIcon from '@mui/icons-material/Notifications';
 
 
 function Header() {
   const {isSearch, isNotification} = useSelector((state) => state.misc)
+  const { notificationsCount} = useSelector((state) => state.chat)
+
   const {loading, logout}  = useLogout()
   const navigate = useNavigate()
-  // const [isNotification, setIsNotification] = useState(false)
+
   const [isNewGroup, setIsNewGroup] = useState(false)
   const dispatch = useDispatch()
 
@@ -49,8 +52,14 @@ function Header() {
       </div>
       <div className='w-[50%] h-[10vh]'>
         <div className='flex justify-end items-center h-[100%]'>
-           <div className='px-4'><FaSearch className='h-6 w-6 cursor-pointer' onClick={openSearch}/></div>
-          <div className='px-4 '> <IoMdNotifications className='h-6 w-6 cursor-pointer' onClick={openNotification} /></div>
+          <div className='px-4'><FaSearch className='h-6 w-6 cursor-pointer' onClick={openSearch}/></div>
+          <div className='px-4 '>
+             <IconBtn 
+             title={"Notifications"}
+             icon={<NotificationsIcon/>}
+             onClick={openNotification}
+             value={notificationsCount}></IconBtn>
+          </div>
           <div className='px-4'><IoMdAdd className='h-6 w-6 cursor-pointer' onClick={openNewGroup}/></div>
           <div className='px-4' ><FaUserGroup className='h-6 w-6 cursor-pointer' onClick={navigateToGroup}/></div>
           <div className='px-4' ><FiLogOut className='h-6 w-6 me-4 cursor-pointer' onClick={logout}/></div> 
@@ -73,6 +82,16 @@ function Header() {
         )}
     </div>
 
+  )
+}
+
+const IconBtn = ({title, icon, onClick, value}) => {
+  return (
+    <Tooltip title={title}>
+      <IconButton color='inherit' size='large' onClick={onClick}>
+        {value ? (<Badge badgeContent={value} color='error'>{icon}</Badge>) : (icon)}
+      </IconButton>
+    </Tooltip>
   )
 }
 

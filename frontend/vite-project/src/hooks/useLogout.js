@@ -25,6 +25,7 @@ const useLogout = () =>{
                 throw new Error(data.error)
             }
             
+            localStorage.removeItem("chat-user")
             dispatch(userNotExists())
             toast.success("Logged out successfully")
             // localStorage.removeItem("chat-user")
