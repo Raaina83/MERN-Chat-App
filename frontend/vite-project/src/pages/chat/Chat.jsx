@@ -21,6 +21,7 @@ const Chat= ({chatId}) => {
   const chatDetails =  useChatDetailsQuery({chatId, skip: !chatId})
 
   const oldMessagesChunk = useGetAllMessagesQuery({chatId, page}) 
+  console.log("chunk-->", oldMessagesChunk)
 
   const {data: oldMessages, setData: setOldMessages} = useInfiniteScrollTop(
     containerRef,
@@ -49,8 +50,11 @@ const Chat= ({chatId}) => {
   }
 
   const newMessagesHandler = useCallback((data) => {
+    console.log("data-->", data)
+    if(data.chatId !== chatId) return
+
     setMessages((prev) => [...prev, data.message])
-  }, [])
+  }, [chatId])
 
   console.log("oldmessages", oldMessages)
 
@@ -61,6 +65,15 @@ const Chat= ({chatId}) => {
   useErrors(errors)
 
   const allMessages = [...oldMessages, ...messages]
+
+  useEffect(() => {
+    return() => {
+      setMessage("")
+      setMessages([])
+      setOldMessages([])
+      setPage(1)
+    }
+  }, [chatId])
 
 
   return chatDetails.isLoading ? (<Skeleton></Skeleton>) : (

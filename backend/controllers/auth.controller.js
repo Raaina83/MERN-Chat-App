@@ -1,9 +1,9 @@
-const User = require("../models/user.model.js");
-const bcrypt = require("bcryptjs");
-const generateTokenAndCookie  =require("../utils/generateToken.js");
+import {User} from  "../models/user.model.js";
+import bcrypt from  "bcryptjs";
+import {generateTokenAndCookie}  from "../utils/generateToken.js";
 
 
-module.exports.login = async(req,res) =>{
+const login = async(req,res) =>{
     try {
         const {userName, password} = req.body;
         const user = await User.findOne({userName});
@@ -27,7 +27,7 @@ module.exports.login = async(req,res) =>{
     }
 }
 
-module.exports.signup = async(req,res) =>{
+const signup = async(req,res) =>{
     try {
         const {fullName, userName, password, confirmPassword ,email, gender} = req.body;
         // console.log(fullName, userName, password, confirmPassword ,email, gender)
@@ -78,7 +78,7 @@ module.exports.signup = async(req,res) =>{
     }
 }
 
-module.exports.logout = (req,res) =>{
+const logout = (req,res) =>{
     try {
         res.cookie("jwt", "", {maxAge: 0});
         return res.status(200).json("Logged out successfully")
@@ -86,4 +86,10 @@ module.exports.logout = (req,res) =>{
         console.log("Error in logout controller", error)
         return res.status(500).json({error: "Internal server Error"})
     }
+}
+
+export {
+    login,
+    signup,
+    logout
 }

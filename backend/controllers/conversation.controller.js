@@ -1,12 +1,12 @@
-const { ALERT, REFETCH_CHATS } = require("../constants/events.js");
-const { getOtherMembers } = require("../lib/helper.js");
-const Conversation = require("../models/conversation.model.js");
-const Message = require("../models/message.model.js");
-const User = require("../models/user.model.js");
-const { emitEvent } = require("../utils/features.js");
+import { ALERT, REFETCH_CHATS } from "../constants/events.js";
+import { getOtherMembers } from "../lib/helper.js";
+import {Conversation} from "../models/conversation.model.js";
+import {Message} from "../models/message.model.js";
+import {User} from "../models/user.model.js";
+import { emitEvent } from "../utils/features.js";
 
 
-module.exports.newGroupChat = async(req,res) => {
+const newGroupChat = async(req,res) => {
     try {
         const {name, participants} = req.body
 
@@ -37,7 +37,7 @@ module.exports.newGroupChat = async(req,res) => {
     }
 }
 
-module.exports.getMyChat = async(req, res) => {
+const getMyChat = async(req, res) => {
     try {
         const conversations= await Conversation.find({ participants: req.user._id }).populate(
             "participants",
@@ -71,7 +71,7 @@ module.exports.getMyChat = async(req, res) => {
     }
 }
 
-module.exports.addMembers = async(req,res) => {
+const addMembers = async(req,res) => {
     try {
         const {chatId, participants} = req.body
         const group = await Conversation.findById(chatId)
@@ -111,7 +111,7 @@ module.exports.addMembers = async(req,res) => {
     }
 }
 
-module.exports.removeMember = async(req,res) => {
+const removeMember = async(req,res) => {
     try {
         const {chatId, userId} = req.body
         const [chat, userToRemove] = await Promise.all([
@@ -154,7 +154,7 @@ module.exports.removeMember = async(req,res) => {
     }
 }
 
-module.exports.leaveGroup = async(req,res) => {
+const leaveGroup = async(req,res) => {
     try {
         const chatId = req.params.id
         const chat = await Conversation.findById(chatId)
@@ -195,7 +195,7 @@ module.exports.leaveGroup = async(req,res) => {
     }
 }
 
-module.exports.getChatDetails = async(req,res) => {
+const getChatDetails = async(req,res) => {
     try {
         if(req.query.populate === "true"){
             const chatId = req.params.id
@@ -233,7 +233,7 @@ module.exports.getChatDetails = async(req,res) => {
     }
 }
 
-module.exports.renameGroup = async(req,res) => {
+const renameGroup = async(req,res) => {
     try {
         const chatId = req.params.id
         const {name} = req.body
@@ -266,7 +266,7 @@ module.exports.renameGroup = async(req,res) => {
     }
 }
 
-module.exports.deleteChat = async(req,res) => {
+const deleteChat = async(req,res) => {
     try {
         const chatId = req.params.id
         const chat = await Conversation.findById(chatId)
@@ -303,7 +303,7 @@ module.exports.deleteChat = async(req,res) => {
     }
 }
 
-module.exports.getMessages = async(req,res) => {
+const getMessages = async(req,res) => {
     try {
         const chatId = req.params.id
         const { page = 1 } = req.query
@@ -333,6 +333,18 @@ module.exports.getMessages = async(req,res) => {
         console.log("Error in getMessages middleware", error)
         res.status(500).json({error: error.message})
     }
+}
+
+export {
+    newGroupChat,
+    getMyChat,
+    addMembers,
+    removeMember,
+    leaveGroup,
+    getChatDetails,
+    renameGroup,
+    deleteChat,
+    getMessages
 }
 
 

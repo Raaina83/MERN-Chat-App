@@ -33,7 +33,8 @@ function ChatItem({
 
         <div className='flex flex-1 border-b-2 border-gray-300 me-4'>
             <div className='flex pt-2'>
-                <p className='text-md ms-4'>{name}</p>
+                <Typography>{name}</Typography>
+                {newMessageAlert && <Typography>{newMessageAlert.count} New Messages</Typography>}
             </div>
         </div>
     </div>

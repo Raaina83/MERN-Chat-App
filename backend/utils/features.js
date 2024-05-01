@@ -1,15 +1,15 @@
 // const { getSockets } = require("../lib/getSocket")
-const {userSocketIDs} = require("../server.js")
+// const {getSockets} = require("../server.js")
 
+import { getSockets } from "../lib/getSocket.js"
 
-module.exports.emitEvent = (req, event, users, data) => {
+const emitEvent = (req, event, users, data) => {
+    // console.log("req-->",req.app)
     const io = req.app.get("io")
+    // console.log("io",io)
     const usersSocket = getSockets(users)
-    io.to(usersSocket.emit(event, data))
+    io.to(usersSocket).emit(event, data)
 }
 
-const getSockets = (users = []) => {
-    const sockets = users.map((user) => userSocketIDs.get(user.toString()))
+export {emitEvent}
 
-    return sockets
-}

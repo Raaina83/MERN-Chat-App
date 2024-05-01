@@ -1,12 +1,12 @@
-const User = require("../models/user.model.js");
-const Conversation = require("../models/conversation.model.js");
-const Request = require("../models/request.model.js");
-const {getOtherMembers} = require("../lib/helper.js");
-const { emitEvent } = require("../utils/features.js");
-const { NEW_REQUEST } = require("../constants/events.js");
+import {User} from "../models/user.model.js";
+import {Conversation} from "../models/conversation.model.js";
+import {Request} from "../models/request.model.js";
+import {getOtherMembers} from "../lib/helper.js";
+import { emitEvent } from "../utils/features.js";
+import { NEW_REQUEST } from "../constants/events.js";
 
 
-module.exports.getUsersForSidebar = async(req,res) =>{
+const getUsersForSidebar = async(req,res) =>{
     try {
         const userId = req.user._id;
 
@@ -20,7 +20,7 @@ module.exports.getUsersForSidebar = async(req,res) =>{
     }
 }
 
-module.exports.searchUser = async(req,res) => {
+const searchUser = async(req,res) => {
     try {
         const {name = ""} = req.query
 
@@ -50,7 +50,7 @@ module.exports.searchUser = async(req,res) => {
     }
 }
 
-module.exports.sendFriendRequest = async(req, res) => {
+const sendFriendRequest = async(req, res) => {
     try {
         const {userId} = req.body
 
@@ -68,6 +68,7 @@ module.exports.sendFriendRequest = async(req, res) => {
             receiverId: userId
         })
 
+        // console.log("req controller-->",req)
         emitEvent(req, NEW_REQUEST, [userId])
 
         return res.status(200).json({
@@ -83,7 +84,7 @@ module.exports.sendFriendRequest = async(req, res) => {
     }
 }
 
-module.exports.acceptFriendRequest = async(req, res) => {
+const acceptFriendRequest = async(req, res) => {
     try {
         const {requestId, accept} = req.body
 
@@ -128,7 +129,7 @@ module.exports.acceptFriendRequest = async(req, res) => {
     }
 }
 
-module.exports.notifications = async(req, res) => {
+const notifications = async(req, res) => {
     try {
         const requests = await Request.find({ receiverId: req.user._id }).populate("senderId", "fullName profile")
 
@@ -155,7 +156,7 @@ module.exports.notifications = async(req, res) => {
     }
 }
 
-module.exports.getMyFriends = async(req, res) => {
+const getMyFriends = async(req, res) => {
     try {
         const chatId = req.query.chatId
 
@@ -195,4 +196,13 @@ module.exports.getMyFriends = async(req, res) => {
             message: error.message
         })   
     }
+}
+
+export {
+    getUsersForSidebar,
+    searchUser,
+    sendFriendRequest,
+    acceptFriendRequest,
+    notifications,
+    getMyFriends
 }

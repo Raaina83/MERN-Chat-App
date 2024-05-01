@@ -1,7 +1,9 @@
-const {userSocketIDs} = require("../server.js")
+import {userSocketIDs} from "../server.js"
 
-module.exports.getSockets = (users = []) => {
+const getSockets = (users = []) => {
     const sockets = users.map((user) => userSocketIDs.get(user.toString()))
 
     return sockets
 }
+
+export {getSockets}

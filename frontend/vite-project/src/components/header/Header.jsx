@@ -14,6 +14,7 @@ import NewGroup from './NewGroup';
 import { setIsMobileMenu, setIsNotification, setIsSearch } from '../../redux/reducers/misc';
 import { useDispatch, useSelector } from 'react-redux';
 import NotificationsIcon from '@mui/icons-material/Notifications';
+import { resetNotification } from '../../redux/reducers/chat';
 
 
 function Header() {
@@ -29,7 +30,10 @@ function Header() {
   const openSearch = () => dispatch(setIsSearch(true))
  
 
-  const openNotification = () => dispatch(setIsNotification(true))
+  const openNotification = () => {
+    dispatch(setIsNotification(true))
+    dispatch(resetNotification())
+  }
 
   const openNewGroup = () => {
     setIsNewGroup((prev) => !prev)

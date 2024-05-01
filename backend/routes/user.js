@@ -1,16 +1,16 @@
-const express = require("express");
-const protectRoute = require("../middleware/protectRoute");
-const userController = require("../controllers/user.controller");
-const { sendRequestValidator, validateHandlor, acceptRequestValidator } = require("../lib/validators");
+import express from "express";
+import {protectRoute} from "../middleware/protectRoute.js";
+import {getUsersForSidebar, searchUser, sendFriendRequest, acceptFriendRequest, notifications} from "../controllers/user.controller.js";
+import { sendRequestValidator, validateHandlor, acceptRequestValidator } from "../lib/validators.js";
 
 const router = express.Router();
 
 router.use(protectRoute)
-router.get("/", userController.getUsersForSidebar)
-router.get("/search", userController.searchUser)
-router.put("/sendrequest",sendRequestValidator(), validateHandlor ,userController.sendFriendRequest)
-router.put("/acceptrequest", acceptRequestValidator(), validateHandlor ,userController.acceptFriendRequest)
-router.get("/notifications", userController.notifications)
+router.get("/",  getUsersForSidebar)
+router.get("/search",  searchUser)
+router.put("/sendrequest",sendRequestValidator(), validateHandlor , sendFriendRequest)
+router.put("/acceptrequest", acceptRequestValidator(), validateHandlor , acceptFriendRequest)
+router.get("/notifications",  notifications)
 // router.get("/")
 
-module.exports = router;
+export default router;

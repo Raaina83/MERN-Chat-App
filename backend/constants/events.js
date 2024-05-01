@@ -8,7 +8,7 @@ const NEW_REQUEST = "NEW_REQUEST";
 
 const NEW_MESSAGE = "NEW_MESSAGE"
 
-module.exports = {
+export  {
     ALERT,
     REFETCH_CHATS,
     NEW_ATTACHMENT,

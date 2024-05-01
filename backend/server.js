@@ -1,34 +1,34 @@
-const express = require('express')
-const dotenv = require("dotenv")
-const {createServer} = require('http')
-const { Server, Socket } = require('socket.io')
-const {v4} = require('uuid')
-const cors = require('cors')
+import express from 'express'
+import dotenv from 'dotenv'
+import { createServer } from 'http'
+import {Server} from 'socket.io'
+import {v4} from 'uuid'
+import cors from 'cors'
 
-const auth = require("./routes/auth.js")
-const message = require("./routes/message.js")
-const user = require("./routes/user.js")
-const conversation = require("./routes/conversation.js")
+import auth from "./routes/auth.js"
+import user from "./routes/user.js"
+import conversation from "./routes/conversation.js"
 
-const connectToMongoDB = require("./db/connectToMongodb.js");
+import {connectToMongoDB} from "./db/connectToMongodb.js";
+
+
+import cookieParser from "cookie-parser"
+import { NEW_MESSAGE, NEW_MESSAGE_ALERT } from './constants/events.js'
+import {Message} from './models/message.model.js'
+import { socketAuthenticator } from './middleware/socketAuthenticator.js'
+import { getSockets } from './lib/getSocket.js'
+// const { createSingleChats, createMessages } = require('./seeders/chats.seeder.js')
+const PORT = process.env.PORT || 5000
+const userSocketIDs = new Map() //all the active users connected
+
 const app = express();
 const server = createServer(app)
 const io = new Server(server, {
     cors:  ({
-        origin: ["http://localhost:5173"], 
+        origin: ["http://localhost:5173", "http://localhost:5000"], 
         credentials: true
     })
 })
-
-const cookieParser = require("cookie-parser");
-const { NEW_MESSAGE, NEW_MESSAGE_ALERT } = require('./constants/events.js')
-// const { getSockets } = require('./lib/getSocket.js')
-const Message = require('./models/message.model.js')
-const { socketAuthenticator } = require('./middleware/socketAuthenticator.js')
-const { profile } = require('console')
-// const { createSingleChats, createMessages } = require('./seeders/chats.seeder.js')
-const PORT = process.env.PORT || 5000
-const userSocketIDs = new Map() //all the active users connected
 
 
 
@@ -47,7 +47,6 @@ app.use(cors({
 
 
 app.use("/api/v1/auth", auth)
-app.use("/api/v1/messages", message)
 app.use("/api/v1/users", user)
 app.use("/api/v1/chat", conversation)
 
@@ -112,11 +111,5 @@ server.listen(PORT,() =>{
     console.log(`App is listening on port ${PORT}`)
 })
 
-const getSockets = (users = []) => {
-    const sockets = users.map((user) => userSocketIDs.get(user.toString()))
 
-    return sockets
-}
-
-
-module.exports = {userSocketIDs}
+export {userSocketIDs}

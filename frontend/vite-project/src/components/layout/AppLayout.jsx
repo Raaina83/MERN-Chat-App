@@ -9,7 +9,7 @@ import { setIsMobileMenu } from '../../redux/reducers/misc'
 import ConversationBox from '../sidebar/ConversationBox'
 import { getSocket } from '../../socket'
 import { NEW_MESSAGE_ALERT, NEW_REQUEST } from '../../constants/events'
-import { incrementNotification } from '../../redux/reducers/chat'
+import { incrementNotification, setNewMessagesAlert } from '../../redux/reducers/chat'
 
 const AppLayout = () => (WrappedComponent) => {
     return (props) => {
@@ -19,6 +19,9 @@ const AppLayout = () => (WrappedComponent) => {
         const socket = getSocket()
 
         const {isMobileMenu} = useSelector((state) => state.misc)
+        const {newMessagesAlert}  = useSelector((state) => state.chat)
+        console.log("newMessagesAlert", newMessagesAlert)
+
         const {isLoading,data,isError,error,refetch} = useMyChatsQuery("")
         const dispatch = useDispatch()
 
@@ -29,11 +32,13 @@ const AppLayout = () => (WrappedComponent) => {
             console.log("Delete Chat", _id, groupChat)
         }
 
-        const newMessageAlertHandler = useCallback(() => {}, [])
+        const newMessageAlertHandler = useCallback((data) => {
+            dispatch(setNewMessagesAlert(data))
+        }, [])
 
         const newRequestHandler = useCallback(() => {
             dispatch(incrementNotification())
-        }, [])
+        }, [dispatch])
 
         const eventHandler = {
             [NEW_MESSAGE_ALERT] : newMessageAlertHandler,
@@ -54,7 +59,8 @@ const AppLayout = () => (WrappedComponent) => {
                 ) :( 
                 <ConversationBox 
                 chats={data?.chats}
-                chatId={chatId}/>
+                chatId={chatId}
+                newMessagesAlert={newMessagesAlert}/>
                 )}
             </Drawer>
 
@@ -74,7 +80,8 @@ const AppLayout = () => (WrappedComponent) => {
                         <ConversationBox 
                         chats={data?.chats}
                         chatId={chatId}
-                        handleDeleteChat={handleDeleteChat}/>
+                        handleDeleteChat={handleDeleteChat}
+                        newMessagesAlert={newMessagesAlert}/>
                     )}
                 </Grid>
 

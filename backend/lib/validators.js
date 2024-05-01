@@ -1,35 +1,35 @@
-const {body, validationResult, param, query} = require("express-validator")
+import {body, validationResult, param, query} from "express-validator"
 
-module.exports.newGroupValidator = () => [
+const newGroupValidator = () => [
     body("name", "Please Enter name").notEmpty(),
     body("participants", "Please select members").notEmpty().isArray({ min: 2 })
 ]
 
-module.exports.addMembersValidator = () => [
+const addMembersValidator = () => [
     body("chatId", "Please provide chatId").notEmpty(),
     body("participants", "Please select members").notEmpty().isArray({ min: 1, max: 97 })
 ]
 
-module.exports.removeMemberValidator = () => [
+const removeMemberValidator = () => [
     body("chatId", "Please Enter chatId").notEmpty(),
     body("userId", "Please Enter userId").notEmpty()
 ]
 
 
-module.exports.renameGroupValidator = () => [
+const renameGroupValidator = () => [
     param("id", "Please Enter Chat ID").notEmpty(),
     body("name", "Please Enter new name").notEmpty()
 ]
 
-module.exports.chatIdValidator = () => [
+const chatIdValidator = () => [
     param("id", "Please Enter Chat ID").notEmpty(),
 ]
 
-module.exports.sendRequestValidator = () => [
+const sendRequestValidator = () => [
     body("userId", "Please Enter User ID").notEmpty(),
 ]
 
-module.exports.acceptRequestValidator = () => [
+const acceptRequestValidator = () => [
     body("requestId", "Please Enter Request ID").notEmpty(),
     body("accept")
     .notEmpty()
@@ -38,10 +38,21 @@ module.exports.acceptRequestValidator = () => [
     .withMessage("Accept must be a boolean value"),
 ]
 
-module.exports.validateHandlor = (req,res, next) => {
+const validateHandlor = (req,res, next) => {
     const errors = validationResult(req)
     const errorMsgs = errors.array().map((error) => error.msg)
 
     if(errors.isEmpty()) return next()
     else next(new Error(errorMsgs))
+}
+
+export {
+    newGroupValidator,
+    addMembersValidator,
+    removeMemberValidator,
+    renameGroupValidator,
+    chatIdValidator,
+    sendRequestValidator,
+    acceptRequestValidator,
+    validateHandlor
 }

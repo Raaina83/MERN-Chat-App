@@ -20,7 +20,7 @@ function ConversationBox({
       { chats?.map((data, index) =>{
         // const {profile, _id, name, groupChat, participants} = data
         // console.log(name)
-
+        console.log("alert-->", newMessagesAlert)
         const newMessageAlert  = newMessagesAlert.find(
           ({chatId}) => chatId === data._id
         )

@@ -1,7 +1,7 @@
-const User = require("../models/user.model");
-const jwt = require("jsonwebtoken");
+import {User} from "../models/user.model.js";
+import jwt from "jsonwebtoken";
 
-module.exports.socketAuthenticator = async(err, socket, next) => {
+const socketAuthenticator = async(err, socket, next) => {
     try {
         if(err) return next(err)
 
@@ -20,3 +20,5 @@ module.exports.socketAuthenticator = async(err, socket, next) => {
         // throw new Error("Please login to access this route")
     }
 }
+
+export {socketAuthenticator}
