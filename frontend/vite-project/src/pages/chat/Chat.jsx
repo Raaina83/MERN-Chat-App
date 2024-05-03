@@ -5,23 +5,33 @@ import { Skeleton, Stack, Typography } from '@mui/material'
 import { RiAttachment2 } from "react-icons/ri";
 import {BsSend} from 'react-icons/bs'
 import { getSocket } from '../../socket.jsx'
-import { NEW_MESSAGE } from '../../constants/events.js'
+import { ALERT, NEW_MESSAGE, START_TYPING, STOP_TYPING } from '../../constants/events.js'
 import { useChatDetailsQuery, useGetAllMessagesQuery } from '../../redux/api/api.js'
 import { useErrors, useSocketEvents } from '../../hooks/hooks.jsx'
 import {useInfiniteScrollTop} from '6pp'
+import { useDispatch } from 'react-redux';
+import { removeNewMessagesAlert } from '../../redux/reducers/chat.js';
+import TypingLoader from '../../components/layout/TypingLoader.jsx';
+import {v4 as uuid} from 'uuid'
 
 const Chat= ({chatId}) => {
   const containerRef = useRef(null)
+  const bottomRef = useRef(null)
   const socket = getSocket()
 
   const [message, setMessage] = useState("")
   const [messages, setMessages] = useState("")
   const [page, setPage] = useState(1)
 
+  const [IAmTyping, setIAmTyping] = useState(false)
+  const [userTyping, setUserTyping] = useState(false)
+  const typingTimeout = useRef(null)
+
+  const dispatch = useDispatch()
+
   const chatDetails =  useChatDetailsQuery({chatId, skip: !chatId})
 
   const oldMessagesChunk = useGetAllMessagesQuery({chatId, page}) 
-  console.log("chunk-->", oldMessagesChunk)
 
   const {data: oldMessages, setData: setOldMessages} = useInfiniteScrollTop(
     containerRef,
@@ -49,16 +59,58 @@ const Chat= ({chatId}) => {
     setMessage("")
   }
 
-  const newMessagesHandler = useCallback((data) => {
-    console.log("data-->", data)
+  const newMessagesListener = useCallback((data) => {
     if(data.chatId !== chatId) return
 
     setMessages((prev) => [...prev, data.message])
   }, [chatId])
 
-  console.log("oldmessages", oldMessages)
+  const startTypingListener = useCallback((data) => {
+    if(data.chatId !== chatId) return
 
-  const eventHandler = {[NEW_MESSAGE] : newMessagesHandler}
+    setUserTyping(true)
+  }, [chatId])
+
+  const stopTypingListener = useCallback((data) => {
+    if(data.chatId !== chatId) return
+
+    setUserTyping(false)
+  }, [chatId])
+
+  const alertListener = useCallback((content) => {
+    const messageForAlert = {
+      content,
+      sender: {
+        _id: uuid(),
+        name: "Admin"
+      },
+      chatId: chatId,
+      createdAt: new Date().toISOString()
+    }
+  }, [])
+
+  const chatInputHandler = (e) => {
+    setMessage(e.target.value)
+
+    if(!IAmTyping){
+      socket.emit(START_TYPING, {participants, chatId})
+      setIAmTyping(true)
+    }
+
+    if(typingTimeout.current) clearTimeout(typingTimeout.current)
+
+    typingTimeout.current = setTimeout(() => { //returns id
+      socket.emit(STOP_TYPING, {participants, chatId})
+      setIAmTyping(false)
+    }, [2000])
+  }
+
+  const eventHandler = {
+    [NEW_MESSAGE] : newMessagesListener,
+    [START_TYPING] : startTypingListener,
+    [STOP_TYPING] : stopTypingListener,
+    [ALERT]: alertListener,
+  }
 
   useSocketEvents(socket, eventHandler)
 
@@ -67,6 +119,7 @@ const Chat= ({chatId}) => {
   const allMessages = [...oldMessages, ...messages]
 
   useEffect(() => {
+    dispatch(removeNewMessagesAlert(chatId))
     return() => {
       setMessage("")
       setMessages([])
@@ -74,6 +127,10 @@ const Chat= ({chatId}) => {
       setPage(1)
     }
   }, [chatId])
+
+  useEffect(() => {
+    if(bottomRef.current) bottomRef.current.scrollIntoView({ behavior: "smooth"})
+  }, [messages])
 
 
   return chatDetails.isLoading ? (<Skeleton></Skeleton>) : (
@@ -87,6 +144,10 @@ const Chat= ({chatId}) => {
         <Typography textAlign={"center"} padding={"1rem"}>Send a Message to start conversation</Typography>
         )}
 
+        {userTyping && <TypingLoader/>}
+
+        <div ref={bottomRef}/>
+
     </Stack>
 
 
@@ -98,7 +159,7 @@ const Chat= ({chatId}) => {
         placeholder='Send a message'
         className=' rounded-md p-2 w-full ps-[4rem] text-black'
         value={message}
-        onChange={(e) => setMessage(e.target.value)}
+        onChange={chatInputHandler}
         // onChange={handler}
         />
         <button className=' absolute inset-y-0 end-4' type='submit'>

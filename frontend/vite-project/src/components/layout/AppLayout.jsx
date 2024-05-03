@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import Header from '../header/Header'
 import { Grid, Drawer } from '@mui/material'
@@ -10,6 +10,7 @@ import ConversationBox from '../sidebar/ConversationBox'
 import { getSocket } from '../../socket'
 import { NEW_MESSAGE_ALERT, NEW_REQUEST } from '../../constants/events'
 import { incrementNotification, setNewMessagesAlert } from '../../redux/reducers/chat'
+import { getOrSaveFromStorage } from '../../lib/features'
 
 const AppLayout = () => (WrappedComponent) => {
     return (props) => {
@@ -20,10 +21,15 @@ const AppLayout = () => (WrappedComponent) => {
 
         const {isMobileMenu} = useSelector((state) => state.misc)
         const {newMessagesAlert}  = useSelector((state) => state.chat)
-        console.log("newMessagesAlert", newMessagesAlert)
 
         const {isLoading,data,isError,error,refetch} = useMyChatsQuery("")
         const dispatch = useDispatch()
+
+        useErrors([{isError, error}])
+
+        useEffect(() => {
+            getOrSaveFromStorage({key: NEW_MESSAGE_ALERT, value: newMessagesAlert})
+        }, [newMessagesAlert])
 
         const handleMobileClose = () => dispatch(setIsMobileMenu(false))
 
@@ -33,8 +39,11 @@ const AppLayout = () => (WrappedComponent) => {
         }
 
         const newMessageAlertHandler = useCallback((data) => {
+            console.log("data---->data", data)
+            if(data.chatId === chatId) return
+
             dispatch(setNewMessagesAlert(data))
-        }, [])
+        }, [chatId])
 
         const newRequestHandler = useCallback(() => {
             dispatch(incrementNotification())
@@ -46,8 +55,6 @@ const AppLayout = () => (WrappedComponent) => {
         }
 
         useSocketEvents(socket, eventHandler)
-
-        useErrors([{isError, error}])
 
         return (
         <div className=' h-[100vh] w-[100vw]'>

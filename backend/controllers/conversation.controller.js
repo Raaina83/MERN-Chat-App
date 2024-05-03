@@ -50,8 +50,8 @@ const getMyChat = async(req, res) => {
            return {
             _id,
             groupChat,
-            profile: groupChat? profile : [otherMembers.profile],
-            name: groupChat? name : [otherMembers.fullName],
+            profile: groupChat? [profile] : [otherMembers.profile],
+            name: groupChat? [name] : [otherMembers.fullName],
             participants: participants.reduce((prev, curr) => {
                 if(curr._id.toString() !== req.user._id.toString()){
                     prev.push(curr._id)
@@ -67,6 +67,24 @@ const getMyChat = async(req, res) => {
         })
     } catch (error) {
         console.log("Error in getMyChat middleware", error)
+        res.status(500).json({error: error.message})   
+    }
+}
+
+const getMyGroups = async(req, res) => {
+    try {
+        const chats = await Conversation.find({ 
+            participants: req.user._id,
+            groupChat: true,
+            creator: req.user._id
+        }).populate("participants", "fullName profile")
+
+        return res.status(201).json({ 
+            success: true,
+            groups: chats
+        })
+    } catch (error) {
+        console.log("Error in getMyGroups middleware", error)
         res.status(500).json({error: error.message})   
     }
 }
@@ -338,6 +356,7 @@ const getMessages = async(req,res) => {
 export {
     newGroupChat,
     getMyChat,
+    getMyGroups,
     addMembers,
     removeMember,
     leaveGroup,

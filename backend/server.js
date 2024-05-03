@@ -13,7 +13,7 @@ import {connectToMongoDB} from "./db/connectToMongodb.js";
 
 
 import cookieParser from "cookie-parser"
-import { NEW_MESSAGE, NEW_MESSAGE_ALERT } from './constants/events.js'
+import { NEW_MESSAGE, NEW_MESSAGE_ALERT, START_TYPING, STOP_TYPING } from './constants/events.js'
 import {Message} from './models/message.model.js'
 import { socketAuthenticator } from './middleware/socketAuthenticator.js'
 import { getSockets } from './lib/getSocket.js'
@@ -84,7 +84,6 @@ io.on("connection", (socket) => {
             chat: chatId
         }
 
-        console.log("emitting", messageRealTime)
         const usersSocket = getSockets(participants)
         io.to(usersSocket).emit(NEW_MESSAGE, {
             chatId,
@@ -100,8 +99,21 @@ io.on("connection", (socket) => {
         }
     })
 
+    socket.on(START_TYPING, ({participants, chatId}) => {
+        console.log("start-typing", chatId)
+
+        const membersSocket = getSockets(participants)
+        socket.to(membersSocket).emit(START_TYPING, {chatId})
+    })
+
+    socket.on(STOP_TYPING, ({participants, chatId}) => {
+        console.log("stop typing", chatId)
+
+        const membersSocket = getSockets(participants)
+        socket.to(membersSocket).emit(STOP_TYPING, {chatId})
+    })
+
     socket.on("disconnect", () => {
-        console.log("user disconnected")
         userSocketIDs.delete(user._id.toString())
     })
 })

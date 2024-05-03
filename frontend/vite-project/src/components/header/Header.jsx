@@ -11,7 +11,7 @@ import SearchDialog from '../specific/SearchDialog';
 import { Backdrop, Badge, IconButton, Tooltip } from '@mui/material';
 import Notification from './Notification'
 import NewGroup from './NewGroup';
-import { setIsMobileMenu, setIsNotification, setIsSearch } from '../../redux/reducers/misc';
+import { setIsMobileMenu, setIsNotification, setIsSearch, setIsNewGroup } from '../../redux/reducers/misc';
 import { useDispatch, useSelector } from 'react-redux';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import { resetNotification } from '../../redux/reducers/chat';
@@ -20,11 +20,12 @@ import { resetNotification } from '../../redux/reducers/chat';
 function Header() {
   const {isSearch, isNotification} = useSelector((state) => state.misc)
   const { notificationsCount} = useSelector((state) => state.chat)
+  const {isNewGroup} = useSelector((state) => state.misc)
 
   const {loading, logout}  = useLogout()
   const navigate = useNavigate()
 
-  const [isNewGroup, setIsNewGroup] = useState(false)
+  // const [isNewGroup, setIsNewGroup] = useState(false)
   const dispatch = useDispatch()
 
   const openSearch = () => dispatch(setIsSearch(true))
@@ -36,7 +37,7 @@ function Header() {
   }
 
   const openNewGroup = () => {
-    setIsNewGroup((prev) => !prev)
+    dispatch(setIsNewGroup(true))
   }
   const handleMobile = () => dispatch(setIsMobileMenu(true))
  

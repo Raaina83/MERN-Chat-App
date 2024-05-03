@@ -10,10 +10,23 @@ import DoneIcon from '@mui/icons-material/Done';
 import ConfirmDeleteDialog from '../../components/dialogs/ConfirmDeleteDialog';
 import AddMemberDialog from '../../components/dialogs/AddMemberDialog';
 import UserItem from '../../components/specific/UserItem';
+import { useMyGroupsQuery } from '../../redux/api/api';
+import {useErrors} from '../../hooks/hooks'
+import {LayoutLoader} from '../../components/layout/Layout'
 
 function Group() {
   const chatId = useSearchParams()[0].get("group")
   const isAddMember= false
+
+  const myGroups = useMyGroupsQuery("")
+  console.log("groups-->", myGroups.data)
+
+  const error = [{
+    isError: myGroups.isError,
+    error: myGroups.error
+  }]
+
+  useErrors(error)
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isEdit, setIsEdit] = useState(false)
@@ -147,7 +160,8 @@ function Group() {
 
     <Button variant='contained' onClick={openAddMember}>Add Member</Button>
   </Stack>
-  return (
+
+  return myGroups.isLoading ? <LayoutLoader/> :  (
     <Grid container height={"100vh"}>
       <Grid item
       sx={{
