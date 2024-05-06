@@ -8,7 +8,7 @@ import { useErrors, useSocketEvents } from '../../hooks/hooks'
 import { setIsMobileMenu } from '../../redux/reducers/misc'
 import ConversationBox from '../sidebar/ConversationBox'
 import { getSocket } from '../../socket'
-import { NEW_MESSAGE_ALERT, NEW_REQUEST } from '../../constants/events'
+import { NEW_MESSAGE_ALERT, NEW_REQUEST, REFETCH_CHATS } from '../../constants/events'
 import { incrementNotification, setNewMessagesAlert } from '../../redux/reducers/chat'
 import { getOrSaveFromStorage } from '../../lib/features'
 
@@ -49,9 +49,14 @@ const AppLayout = () => (WrappedComponent) => {
             dispatch(incrementNotification())
         }, [dispatch])
 
+        const refetchhandler = useCallback(() => {
+                refetch()
+        }, [refetch])
+
         const eventHandler = {
             [NEW_MESSAGE_ALERT] : newMessageAlertHandler,
-            [NEW_REQUEST] : newRequestHandler    
+            [NEW_REQUEST] : newRequestHandler,
+            [REFETCH_CHATS]: refetchhandler,    
         }
 
         useSocketEvents(socket, eventHandler)

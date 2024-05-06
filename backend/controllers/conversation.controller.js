@@ -1,9 +1,12 @@
 import { ALERT, REFETCH_CHATS } from "../constants/events.js";
 import { getOtherMembers } from "../lib/helper.js";
+import { errorMiddleware } from "../middleware/error.js";
 import {Conversation} from "../models/conversation.model.js";
 import {Message} from "../models/message.model.js";
 import {User} from "../models/user.model.js";
 import { emitEvent } from "../utils/features.js";
+import { ErrorHandler } from "../utils/utility.js";
+
 
 
 const newGroupChat = async(req,res) => {
@@ -79,6 +82,15 @@ const getMyGroups = async(req, res) => {
             creator: req.user._id
         }).populate("participants", "fullName profile")
 
+        // const groups = chats.map((chat) => (
+        //     chat.name,
+        //     chat.profile = [chat.profile],
+        //     chat.participants,
+        //     chat.creator,
+        //     chat.createdAt,
+        //     chat._id,
+        //     chat.updatedAt
+        // ))
         return res.status(201).json({ 
             success: true,
             groups: chats
@@ -89,18 +101,21 @@ const getMyGroups = async(req, res) => {
     }
 }
 
-const addMembers = async(req,res) => {
+const addMembers = async(req,res, next) => {
     try {
         const {chatId, participants} = req.body
         const group = await Conversation.findById(chatId)
+
+        if (!chat) return next(new ErrorHandler("Chat not found", 404));
+
         if(!participants || participants.length < 1){
-            throw new Error("Please select members.")
+            return next(new ErrorHandler("Please select members", 400))
         }
         if(!group) {
             throw new Error("Chat not found")//404
         }
         if(!group.groupChat){
-            throw new Error("This is not a group chat") //400(bad request)
+            return next(new ErrorHandler("This is not a group chat", 400))
         }
         if(group.creator.toString() !== req.user._id.toString()) {
             throw new Error("You are not allowed to add members") //403(forbidden)
@@ -129,12 +144,12 @@ const addMembers = async(req,res) => {
     }
 }
 
-const removeMember = async(req,res) => {
+const removeMember = async(req,res, next) => {
     try {
         const {chatId, userId} = req.body
         const [chat, userToRemove] = await Promise.all([
             Conversation.findById(chatId),
-            User.findById(userId, "name")
+            User.findById(userId, "fullName")
         ])
 
         if(!userToRemove || userToRemove.length < 1){
@@ -151,7 +166,8 @@ const removeMember = async(req,res) => {
             throw new Error("You are not allowed to remove members") //403(forbidden)
         }
         if(chat.participants.length <= 3){
-            throw new Error("Group must have at least 3 members")
+            return next(new ErrorHandler("Group must have at least 3 members", 400))
+            // throw new Error("Group must have at least 3 members")
         }
         //make sure to come back and cover the case when userToRemove is not part of the group
         chat.participants = chat.participants.filter((participant) => participant.toString() !== userId.toString())
@@ -272,6 +288,8 @@ const renameGroup = async(req,res) => {
         chat.name = name
 
         await chat.save()
+
+        emitEvent(req, REFETCH_CHATS, chat.participants)
 
         return res.status(200).json({
             success: true,

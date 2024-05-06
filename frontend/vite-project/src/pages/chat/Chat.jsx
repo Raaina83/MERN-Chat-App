@@ -87,6 +87,8 @@ const Chat= ({chatId}) => {
       chatId: chatId,
       createdAt: new Date().toISOString()
     }
+
+    setMessages((prev) => [...prev, messageForAlert])
   }, [])
 
   const chatInputHandler = (e) => {

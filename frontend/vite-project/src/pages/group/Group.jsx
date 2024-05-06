@@ -10,8 +10,8 @@ import DoneIcon from '@mui/icons-material/Done';
 import ConfirmDeleteDialog from '../../components/dialogs/ConfirmDeleteDialog';
 import AddMemberDialog from '../../components/dialogs/AddMemberDialog';
 import UserItem from '../../components/specific/UserItem';
-import { useMyGroupsQuery } from '../../redux/api/api';
-import {useErrors} from '../../hooks/hooks'
+import { useAddGroupMemberMutation, useChatDetailsQuery, useMyGroupsQuery, useRemoveGroupMemberMutation, useRenameGroupMutation } from '../../redux/api/api';
+import {useAsyncMutationHook, useErrors} from '../../hooks/hooks'
 import {LayoutLoader} from '../../components/layout/Layout'
 
 function Group() {
@@ -19,20 +19,54 @@ function Group() {
   const isAddMember= false
 
   const myGroups = useMyGroupsQuery("")
-  console.log("groups-->", myGroups.data)
 
-  const error = [{
-    isError: myGroups.isError,
-    error: myGroups.error
-  }]
+  const groupDetails  = useChatDetailsQuery({chatId, populate: true}, {skip: !chatId})
+  console.log("groups-->", groupDetails.data)
+
+  const [updateGroup, isLoadingGroupName] = useAsyncMutationHook(useRenameGroupMutation)
+
+  const [removeMember, isLoadingRemoveMember] = useAsyncMutationHook(useRemoveGroupMemberMutation)
+
+  const [addMember, isLoadingAddMember] = useAsyncMutationHook(useAddGroupMemberMutation)
+
+  const error = [
+    {
+      isError: myGroups.isError,
+      error: myGroups.error
+    },
+    {
+      isError: groupDetails.isError,
+      error: groupDetails.error
+     },
+    //{
+    //   isError: removeMember.isError
+    // }
+]
 
   useErrors(error)
+
+  useEffect(() => {
+    if(groupDetails.data){
+      setGroupName(groupDetails.data.chat.name)
+      setUpdatedGroupName()
+      setUsers(groupDetails.data.chat.participants)
+    }
+
+    return () => {
+      setGroupName("")
+      setUpdatedGroupName("")
+      setUsers([])
+      setIsEdit(false)
+    }
+  }, [groupDetails.data])
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isEdit, setIsEdit] = useState(false)
   const [groupName, setGroupName] = useState("")
   const [updatedGroupName, setUpdatedGroupName] = useState("") 
   const [confirmDeleteDialog, setConfirmDeleteDialog] = useState(false)
+
+  const [users, setUsers] = useState([])
 
   const navigate = useNavigate()
   const navigateBack = () => {
@@ -50,10 +84,15 @@ function Group() {
 
   const updateGroupName = () => {
     setIsEdit(false)
+    updateGroup("Updating Group Name...", {
+      chatId,
+      name: updatedGroupName
+    })
   }
 
-  const removeMemberHandler = (id) => {
-    console.log("id:" ,id)
+  const removeMemberHandler = (userId) => {
+    console.log(userId)
+    removeMember("Remove Member", {chatId, userId})
   }
 
   const openConfirmDeleteHandler = () => {
@@ -72,18 +111,18 @@ function Group() {
 
   }
 
-  useEffect(()=> {
-    if(chatId){
-      setGroupName(`Group Name ${chatId}`)
-      setUpdatedGroupName(`New name ${chatId}`)
-    }
+  // useEffect(()=> {
+  //   if(chatId){
+  //     setGroupName(`Group Name ${chatId}`)
+  //     setUpdatedGroupName(`New name ${chatId}`)
+  //   }
 
-    return () => {
-      setGroupName("")
-      setUpdatedGroupName("")
-      setIsEdit(false)
-    }
-  }, [chatId])
+  //   return () => {
+  //     setGroupName("")
+  //     setUpdatedGroupName("")
+  //     setIsEdit(false)
+  //   }
+  // }, [chatId])
 
   const IconBtns = <>
   <Box sx={{
@@ -131,12 +170,12 @@ function Group() {
     {isEdit ? (
       <>
         <TextField value={updatedGroupName} onChange={(e) => setUpdatedGroupName(e.target.value)}></TextField>
-        <IconButton onClick={updateGroupName}><DoneIcon/></IconButton>
+        <IconButton onClick={updateGroupName} disabled={isLoadingGroupName}><DoneIcon/></IconButton>
       </>
     ) : (
       <>
         <Typography variant='h4'>{groupName}</Typography>
-        <IconButton onClick={() => setIsEdit(true)}><EditIcon/></IconButton>
+        <IconButton onClick={() => setIsEdit(true)} disabled={isLoadingGroupName}><EditIcon/></IconButton>
       </>
     )}
 
@@ -172,7 +211,7 @@ function Group() {
       }}
       sm={4}
       bgcolor={"bisque"}
-      ><GroupsList myGroups={sampleChats} chatId={chatId}/></Grid>
+      ><GroupsList myGroups={myGroups?.data?.groups} chatId={chatId}/></Grid>
 
       <Grid
       item
@@ -207,7 +246,7 @@ function Group() {
             spacing={"2rem"}
             height={"50vh"}
             overflow={"auto"}
-            >{sampleData.map((user) => (
+            >{groupDetails?.data?.chat?.participants.map((user) => (
                 <UserItem 
                   user={user} 
                   isAdded 
@@ -249,7 +288,7 @@ function Group() {
           sm: "none"
         }
       }}>
-        <GroupsList myGroups={sampleChats} w={'50vw'} chatId={chatId}/>
+        <GroupsList myGroups={myGroups?.data?.groups} w={'50vw'} chatId={chatId}/>
       </Drawer>
     </Grid>
   )
