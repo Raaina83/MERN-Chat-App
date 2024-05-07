@@ -10,7 +10,7 @@ const SocketProvider = ({children}) => {
     const socket = useMemo(() => 
         io('http://localhost:5000', {
         withCredentials: true,
-        auth: { token: localStorage.getItem("token")}
+        // auth: { token: localStorage.getItem("token")}
     }), [])
 
     return (

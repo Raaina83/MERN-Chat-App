@@ -77,19 +77,23 @@ const Chat= ({chatId}) => {
     setUserTyping(false)
   }, [chatId])
 
-  const alertListener = useCallback((content) => {
+  const alertListener = useCallback((message) => {
     const messageForAlert = {
-      content,
-      sender: {
+      message,
+      senderId: {
         _id: uuid(),
-        name: "Admin"
+        fullName: "Admin"
       },
       chatId: chatId,
       createdAt: new Date().toISOString()
     }
 
+    console.log("alert-->",messageForAlert)
+
     setMessages((prev) => [...prev, messageForAlert])
-  }, [])
+  }, [chatId])
+
+
 
   const chatInputHandler = (e) => {
     setMessage(e.target.value)

@@ -13,21 +13,24 @@ import UserItem from '../../components/specific/UserItem';
 import { useAddGroupMemberMutation, useChatDetailsQuery, useMyGroupsQuery, useRemoveGroupMemberMutation, useRenameGroupMutation } from '../../redux/api/api';
 import {useAsyncMutationHook, useErrors} from '../../hooks/hooks'
 import {LayoutLoader} from '../../components/layout/Layout'
+import { useDispatch, useSelector } from 'react-redux';
+import { setIsAddMember } from '../../redux/reducers/misc';
 
 function Group() {
   const chatId = useSearchParams()[0].get("group")
-  const isAddMember= false
+
+  const dispatch = useDispatch()
+
+
+  const {isAddMember}= useSelector((state) => state.misc)
 
   const myGroups = useMyGroupsQuery("")
 
   const groupDetails  = useChatDetailsQuery({chatId, populate: true}, {skip: !chatId})
-  console.log("groups-->", groupDetails.data)
 
   const [updateGroup, isLoadingGroupName] = useAsyncMutationHook(useRenameGroupMutation)
 
   const [removeMember, isLoadingRemoveMember] = useAsyncMutationHook(useRemoveGroupMemberMutation)
-
-  const [addMember, isLoadingAddMember] = useAsyncMutationHook(useAddGroupMemberMutation)
 
   const error = [
     {
@@ -72,8 +75,7 @@ function Group() {
   const navigateBack = () => {
     navigate("/")
   }
-
-  console.log(chatId)
+  
   const handleMobile = () => {
     setIsMobileMenuOpen((prev) => !prev)
   }
@@ -104,7 +106,7 @@ function Group() {
   }
 
   const openAddMember = () => {
-
+    dispatch(setIsAddMember(true))
   }
 
   const deleteHandler = () => {
@@ -271,7 +273,7 @@ function Group() {
 
       {isAddMember && (
         <Suspense>
-          <AddMemberDialog/>
+          <AddMemberDialog chatId={chatId}/>
         </Suspense>
       )}
 

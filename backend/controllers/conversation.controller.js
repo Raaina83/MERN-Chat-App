@@ -106,14 +106,14 @@ const addMembers = async(req,res, next) => {
         const {chatId, participants} = req.body
         const group = await Conversation.findById(chatId)
 
-        if (!chat) return next(new ErrorHandler("Chat not found", 404));
+        if (!group) return next(new ErrorHandler("Chat not found", 404));
 
         if(!participants || participants.length < 1){
             return next(new ErrorHandler("Please select members", 400))
         }
-        if(!group) {
-            throw new Error("Chat not found")//404
-        }
+        // if(!group) {
+        //     throw new Error("Chat not found")//404
+        // }
         if(!group.groupChat){
             return next(new ErrorHandler("This is not a group chat", 400))
         }
@@ -132,6 +132,17 @@ const addMembers = async(req,res, next) => {
         }
 
         await group.save()
+
+        const allUsersName = allNewMembers.map((i) => i.fullName).join(", ");
+
+        emitEvent(
+            req,
+            ALERT,
+            group.participants,
+            `${allUsersName} has been added in the group`
+          );
+        
+          emitEvent(req, REFETCH_CHATS, group.participants);
 
         return res.status(200).json({
             success: true,
@@ -184,7 +195,8 @@ const removeMember = async(req,res, next) => {
 
     } catch (error) {
         console.log("Error in removeMember middleware", error)
-        res.status(500).json({error: error.message}) 
+        // res.status(500).json({error: error.message}) 
+        next(error)
     }
 }
 
