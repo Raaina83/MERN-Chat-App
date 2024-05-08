@@ -3,24 +3,12 @@ import {Conversation} from "../models/conversation.model.js";
 import {Request} from "../models/request.model.js";
 import {getOtherMembers} from "../lib/helper.js";
 import { emitEvent } from "../utils/features.js";
-import { NEW_REQUEST } from "../constants/events.js";
+import { NEW_REQUEST, REFETCH_CHATS } from "../constants/events.js";
+import { ErrorHandler } from "../utils/utility.js";
 
 
-const getUsersForSidebar = async(req,res) =>{
-    try {
-        const userId = req.user._id;
 
-        const allUsers = await User.find({ _id: {$ne: userId}}).select("-password"); //return all users that are not equal(ne) to currently logged in user
-
-        res.status(200).json(allUsers)
-
-    } catch (error) {
-        console.log("Error in getUsersForSidebar controller", error)
-        res.status(500).json({error: "Internal server Error"})
-    }
-}
-
-const searchUser = async(req,res) => {
+const searchUser = async(req, res, next) => {
     try {
         const {name = ""} = req.query
 
@@ -46,11 +34,12 @@ const searchUser = async(req,res) => {
         
     } catch (error) {
         console.log("Error in searchUser controller", error)
-        res.status(500).json({error: "Internal server Error"})
+        next(error)
+        // res.status(500).json({error: "Internal server Error"})
     }
 }
 
-const sendFriendRequest = async(req, res) => {
+const sendFriendRequest = async(req, res, next) => {
     try {
         const {userId} = req.body
 
@@ -61,7 +50,10 @@ const sendFriendRequest = async(req, res) => {
             ]
         })
 
-        if(request) throw new Error("Request already exists")
+        if(request) {
+            return next(new ErrorHandler("Request already exists", 400))
+            // throw new Error("Request already exists")
+        }
     
         await Request.create({
             senderId: req.user._id,
@@ -77,14 +69,15 @@ const sendFriendRequest = async(req, res) => {
         })
     } catch (error) {
         console.log("Error in sendFriendRequest controller", error)
-        return res.status(500).json({
-            success: false,
-            message: error.message
-        })
+        next(error)
+        // return res.status(500).json({
+        //     success: false,
+        //     message: error.message
+        // })
     }
 }
 
-const acceptFriendRequest = async(req, res) => {
+const acceptFriendRequest = async(req, res, next) => {
     try {
         const {requestId, accept} = req.body
 
@@ -92,9 +85,9 @@ const acceptFriendRequest = async(req, res) => {
         .populate("senderId", "fullName profile")
         .populate("receiverId", "fullName profile")
 
-        if(!request) throw new Error("Request not found")//404
+        if(!request) return next(new ErrorHandler("Request does not exist", 404))
 
-        if(request.receiverId._id.toString() !== req.user._id.toString()) throw new Error("Unauthorized")
+        if(request.receiverId._id.toString() !== req.user._id.toString()) return next(new ErrorHandler("Unauthorized", 401))
 
         if(!accept) {
             await request.deleteOne()
@@ -114,6 +107,8 @@ const acceptFriendRequest = async(req, res) => {
             request.deleteOne()
         ])
 
+        emitEvent(req, REFETCH_CHATS, members)
+
         return res.status(200).json({
             success: true,
             message: "Friend Request accepted",
@@ -121,15 +116,16 @@ const acceptFriendRequest = async(req, res) => {
         })
 
     } catch (error) {
-        console.log("Error in acceptFriendRequest controller", error.message)
-        return res.status(500).json({
-            success: false,
-            message: error.message
-        })
+        console.log("Error in acceptFriendRequest controller", error)
+        next(error)
+        // return res.status(500).json({
+        //     success: false,
+        //     message: error.message
+        // })
     }
 }
 
-const notifications = async(req, res) => {
+const notifications = async(req, res, next) => {
     try {
         const requests = await Request.find({ receiverId: req.user._id }).populate("senderId", "fullName profile")
 
@@ -148,15 +144,16 @@ const notifications = async(req, res) => {
         })
 
     } catch (error) {
-        console.log("Error in acceptFriendRequest controller", error)
-        return res.status(500).json({
-            success: false,
-            message: error.message
-        })   
+        console.log("Error in notification controller", error)
+        next(error)
+        // return res.status(500).json({
+        //     success: false,
+        //     message: error.message
+        // })   
     }
 }
 
-const getMyFriends = async(req, res) => {
+const getMyFriends = async(req, res, next) => {
     try {
         const chatId = req.query.chatId
 
@@ -190,16 +187,16 @@ const getMyFriends = async(req, res) => {
          
 
     } catch (error) {
-        console.log("Error in acceptFriendRequest controller", error)
-        return res.status(500).json({
-            success: false,
-            message: error.message
-        })   
+        console.log("Error in getMyFriends controller", error)
+        next(error)
+        // return res.status(500).json({
+        //     success: false,
+        //     message: error.message
+        // })   
     }
 }
 
 export {
-    getUsersForSidebar,
     searchUser,
     sendFriendRequest,
     acceptFriendRequest,

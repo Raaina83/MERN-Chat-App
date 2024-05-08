@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken"
 
-const generateTokenAndCookie = (userId, res) =>{
+const generateTokenAndCookie = (userId, res, message) =>{
     const token = jwt.sign({userId}, process.env.JWT_SECRET, {
         expiresIn: '7d'
     });
@@ -10,6 +10,9 @@ const generateTokenAndCookie = (userId, res) =>{
         httpOnly: true, //prevent XXS attacks--> cross-side scripting attacks
         sameSite: "strict", //CSRF attacks--> cross-site request frogery attacks 
         secure: process.env.NODE_ENV !== "development"
+    }).json({
+        success: true,
+        message
     });
 }
 

@@ -9,12 +9,13 @@ import { ErrorHandler } from "../utils/utility.js";
 
 
 
-const newGroupChat = async(req,res) => {
+const newGroupChat = async(req,res, next) => {
     try {
         const {name, participants} = req.body
 
         if(participants.length < 2) {
-            return res.status(400).json({error: "Chat must have at least 3 members"})
+            return next(ErrorHandler("Chat must have at least 3 members", 400))
+            // return res.status(400).json({error: "Chat must have at least 3 members"})
         }
         const allParticipants = [...participants, req.user]
         const profileAddress = "https://wabetainfo.com/wp-content/uploads/2022/05/WA_GROUP_FB.png"
@@ -36,11 +37,12 @@ const newGroupChat = async(req,res) => {
         })
     } catch (error) {
         console.log("Error in newGroupChat middleware", error)
-        res.status(500).json({error: error.message})
+        next(error)
+        // res.status(500).json({error: error.message})
     }
 }
 
-const getMyChat = async(req, res) => {
+const getMyChat = async(req, res, next) => {
     try {
         const conversations= await Conversation.find({ participants: req.user._id }).populate(
             "participants",
@@ -70,11 +72,12 @@ const getMyChat = async(req, res) => {
         })
     } catch (error) {
         console.log("Error in getMyChat middleware", error)
-        res.status(500).json({error: error.message})   
+        next(error)
+        // res.status(500).json({error: error.message})   
     }
 }
 
-const getMyGroups = async(req, res) => {
+const getMyGroups = async(req, res, next) => {
     try {
         const chats = await Conversation.find({ 
             participants: req.user._id,
@@ -97,7 +100,8 @@ const getMyGroups = async(req, res) => {
         })
     } catch (error) {
         console.log("Error in getMyGroups middleware", error)
-        res.status(500).json({error: error.message})   
+        next(error)
+        // res.status(500).json({error: error.message})   
     }
 }
 
@@ -118,7 +122,8 @@ const addMembers = async(req,res, next) => {
             return next(new ErrorHandler("This is not a group chat", 400))
         }
         if(group.creator.toString() !== req.user._id.toString()) {
-            throw new Error("You are not allowed to add members") //403(forbidden)
+            return next(new ErrorHandler("You are not allowed to add members"), 403)
+            // throw new Error("You are not allowed to add members") //403(forbidden)
         }
         const allNewMembersPromise = participants.map((i) => User.findById( i, "fullName" ))
 
@@ -128,7 +133,8 @@ const addMembers = async(req,res, next) => {
         group.participants.push(...uniqueMembers.map((i) => i._id))
 
         if(group.participants.length > 100){
-            throw new Error("Group members limit reached")//400
+            return next(new ErrorHandler("Group members limit reached", 400))
+            // throw new Error("Group members limit reached")//400
         }
 
         await group.save()
@@ -151,7 +157,8 @@ const addMembers = async(req,res, next) => {
 
     } catch (error) {
         console.log("Error in addMembers middleware", error)
-        res.status(500).json({error: error.message})    
+        next(error)
+        // res.status(500).json({error: error.message})    
     }
 }
 
@@ -168,13 +175,16 @@ const removeMember = async(req,res, next) => {
         }
 
         if(!chat) {
-            throw new Error("Chat not found")//404
+            return next(new ErrorHandler("Chat not found", 404))
+            // throw new Error("Chat not found")//404
         }
         if(!chat.groupChat){
-            throw new Error("This is not a group chat") //400(bad request)
+            return next(new ErrorHandler("This is not a group chat", 400))
+            // throw new Error("This is not a group chat") //400(bad request)
         }
         if(chat.creator.toString() !== req.user._id.toString()) {
-            throw new Error("You are not allowed to remove members") //403(forbidden)
+            return next(new ErrorHandler("You are not allowed to remove members", 403))
+            // throw new Error("You are not allowed to remove members") //403(forbidden)
         }
         if(chat.participants.length <= 3){
             return next(new ErrorHandler("Group must have at least 3 members", 400))
@@ -200,16 +210,18 @@ const removeMember = async(req,res, next) => {
     }
 }
 
-const leaveGroup = async(req,res) => {
+const leaveGroup = async(req,res, next) => {
     try {
         const chatId = req.params.id
         const chat = await Conversation.findById(chatId)
 
         if(!chat) {
-            throw new Error("Chat not found")//404
+            return next(new ErrorHandler("Chat not found", 404))
+            // throw new Error("Chat not found")//404
         }
         if(!chat.groupChat){
-            throw new Error("This is not a group chat") //400(bad request)
+            return next(new ErrorHandler("This is not a group chat", 400))
+            // throw new Error("This is not a group chat") //400(bad request)
         }
 
         const remainingMembers = chat.participants.filter(
@@ -217,7 +229,8 @@ const leaveGroup = async(req,res) => {
         )
 
         if(remainingMembers.length < 3){
-            throw new Error("Group must have at least 3 members")
+            return next(new ErrorHandler("Group must have at least 3 members", 400))
+            // throw new Error("Group must have at least 3 members")
         }
 
         if(chat.creator.toString() === req.user._id.toString()){
@@ -226,10 +239,12 @@ const leaveGroup = async(req,res) => {
         }
         
         chat.participants = remainingMembers
-        await chat.save()
+        const [user] = await Promise.all([
+            User.findById(req.user._id),
+            chat.save()
+        ])
 
-        emitEvent(req, ALERT, chat.participants, `${userToRemove} has left the group `)
-        emitEvent(req, REFETCH_CHATS, chat.participants)
+        emitEvent(req, ALERT, chat.participants, `${user} has left the group `)
 
         return res.status(200).json({
             success: true,
@@ -237,20 +252,21 @@ const leaveGroup = async(req,res) => {
         })
     } catch (error) {
         console.log("Error in leaveGroup middleware", error)
-        res.status(500).json({error: error.message}) 
+        next(error)
+        // res.status(500).json({error: error.message}) 
     }
 }
 
-const getChatDetails = async(req,res) => {
+const getChatDetails = async(req, res, next) => {
     try {
         if(req.query.populate === "true"){
             const chatId = req.params.id
-            console.log("chatId", chatId)
 
             const chat = await Conversation.findById(chatId).populate("participants", "fullName profile")
             
             if(!chat){
-                throw new Error("Chat not found")
+                return next(ErrorHandler("Chat not found", 404))
+                // throw new Error("Chat not found")
             }
 
             return res.status(200).json({
@@ -259,11 +275,11 @@ const getChatDetails = async(req,res) => {
             })
         } else{
             const chatId = req.params.id
-            console.log("chatId", chatId)
             const chat = await Conversation.findById(chatId)
 
             if(!chat){
-                throw new Error("Chat not found")
+                return next(ErrorHandler("Chat not found", 404))
+                // throw new Error("Chat not found")
             }
 
             return res.status(200).json({
@@ -275,26 +291,30 @@ const getChatDetails = async(req,res) => {
 
     } catch (error) {
         console.log("Error in getChatDetails middleware", error)
-        res.status(500).json({error: error.message}) 
+        next(error)
+        // res.status(500).json({error: error.message}) 
     }
 }
 
-const renameGroup = async(req,res) => {
+const renameGroup = async(req,res, next) => {
     try {
         const chatId = req.params.id
         const {name} = req.body
         const chat = await Conversation.findById(chatId)
 
         if(!chat){
-            throw new Error("Chat not found")
+            return next(new ErrorHandler("Chat not found", 404))
+            // throw new Error("Chat not found")
         }
 
         if(!chat.groupChat){
-            throw new Error("This not a group chat")
+            return next(new ErrorHandler("This is not a group chat", 403))
+            // throw new Error("This not a group chat")
         }
 
         if(chat.creator.toString() !== req.user._id.toString()){
-            throw new Error("You are not allowed to rename this group")
+            return next(new ErrorHandler("You are not allowed to rename this group", 403))
+            // throw new Error("You are not allowed to rename this group")
         }
 
         chat.name = name
@@ -310,27 +330,31 @@ const renameGroup = async(req,res) => {
 
     } catch (error) {
         console.log("Error in renameGroup middleware", error)
-        res.status(500).json({error: error.message})
+        next(error)
+        // res.status(500).json({error: error.message})
     }
 }
 
-const deleteChat = async(req,res) => {
+const deleteChat = async(req,res, next) => {
     try {
         const chatId = req.params.id
         const chat = await Conversation.findById(chatId)
 
         if(!chat){
-            throw new Error("Chat not found")
+            return next(ErrorHandler("Chat not found", 404))
+            // throw new Error("Chat not found")
         }
 
         const participants = chat.participants
 
         if(chat.groupChat && chat.creator.toString() !== req.user._id.toString()){
-            throw new Error("You are not allowed to delete this group")
+            return next(ErrorHandler("You are not allowed to delete this group", 403))
+            // throw new Error("You are not allowed to delete this group")
         }
 
         if(!chat.groupChat && !chat.participants.includes(req.user._id.toString())){
-            throw new Error("You are not allowed to delete this group")
+            return next(ErrorHandler("You are not allowed to delete this group", 403))
+            // throw new Error("You are not allowed to delete this group")
         }
 
         // const messages = await Message.find({ chat: chatId})
@@ -347,11 +371,12 @@ const deleteChat = async(req,res) => {
         
     } catch (error) {
         console.log("Error in deleteChat middleware", error)
-        res.status(500).json({error: error.message})
+        next(error)
+        // res.status(500).json({error: error.message})
     }
 }
 
-const getMessages = async(req,res) => {
+const getMessages = async(req,res, next) => {
     try {
         const chatId = req.params.id
         const { page = 1 } = req.query
@@ -379,7 +404,8 @@ const getMessages = async(req,res) => {
 
     } catch (error) {
         console.log("Error in getMessages middleware", error)
-        res.status(500).json({error: error.message})
+        next(error)
+        // res.status(500).json({error: error.message})
     }
 }
 

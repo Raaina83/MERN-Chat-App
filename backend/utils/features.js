@@ -11,5 +11,12 @@ const emitEvent = (req, event, users, data) => {
     io.to(usersSocket).emit(event, data)
 }
 
-export {emitEvent}
+const cookieOptions = {
+        maxAge: 7 * 24 * 60 * 60 * 1000, //millisecond(15days)
+        httpOnly: true, //prevent XXS attacks--> cross-side scripting attacks
+        sameSite: "strict", //CSRF attacks--> cross-site request frogery attacks 
+        secure: true
+}
+
+export {emitEvent, cookieOptions}
 

@@ -1,4 +1,13 @@
 import {body, validationResult, param, query} from "express-validator"
+import { ErrorHandler } from "../utils/utility.js"
+
+const signUpValidator = () => [
+    body(["fullName", "userName", "password", "confirmPassword" , "email", "gender"]).notEmpty().withMessage("Please fill in all the fields")
+]
+
+const loginValidator = () => [
+    body(["userName", "password"]).notEmpty().withMessage("Please fill in all the fields")
+]
 
 const newGroupValidator = () => [
     body("name", "Please Enter name").notEmpty(),
@@ -14,7 +23,6 @@ const removeMemberValidator = () => [
     body("chatId", "Please Enter chatId").notEmpty(),
     body("userId", "Please Enter userId").notEmpty()
 ]
-
 
 const renameGroupValidator = () => [
     param("id", "Please Enter Chat ID").notEmpty(),
@@ -40,13 +48,16 @@ const acceptRequestValidator = () => [
 
 const validateHandlor = (req,res, next) => {
     const errors = validationResult(req)
-    const errorMsgs = errors.array().map((error) => error.msg)
+    const errorMsgs = errors.array().map((error) => error.msg).join(", ")
 
     if(errors.isEmpty()) return next()
-    else next(new Error(errorMsgs))
+
+    else next(new ErrorHandler(errorMsgs, 400))
 }
 
 export {
+    signUpValidator,
+    loginValidator,
     newGroupValidator,
     addMembersValidator,
     removeMemberValidator,

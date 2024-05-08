@@ -17,6 +17,7 @@ import { NEW_MESSAGE, NEW_MESSAGE_ALERT, START_TYPING, STOP_TYPING } from './con
 import {Message} from './models/message.model.js'
 import { socketAuthenticator } from './middleware/socketAuthenticator.js'
 import { getSockets } from './lib/getSocket.js'
+import { errorMiddleware } from './middleware/error.js'
 // const { createSingleChats, createMessages } = require('./seeders/chats.seeder.js')
 const PORT = process.env.PORT || 5000
 const userSocketIDs = new Map() //all the active users connected
@@ -49,6 +50,8 @@ app.use(cors({
 app.use("/api/v1/auth", auth)
 app.use("/api/v1/users", user)
 app.use("/api/v1/chat", conversation)
+
+app.use(errorMiddleware)
 
 io.use((socket, next) => {
     cookieParser()(
