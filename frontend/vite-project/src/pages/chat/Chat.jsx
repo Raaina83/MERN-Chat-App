@@ -12,7 +12,7 @@ import {useInfiniteScrollTop} from '6pp'
 import { useDispatch } from 'react-redux';
 import { removeNewMessagesAlert } from '../../redux/reducers/chat.js';
 import TypingLoader from '../../components/layout/TypingLoader.jsx';
-import {v4 as uuid} from 'uuid'
+import { useNavigate } from 'react-router-dom';
 
 const Chat= ({chatId}) => {
   const containerRef = useRef(null)
@@ -28,6 +28,7 @@ const Chat= ({chatId}) => {
   const typingTimeout = useRef(null)
 
   const dispatch = useDispatch()
+  const navigate = useNavigate()
 
   const chatDetails =  useChatDetailsQuery({chatId, skip: !chatId})
 
@@ -59,8 +60,27 @@ const Chat= ({chatId}) => {
     setMessage("")
   }
 
+  useEffect(() => {
+    dispatch(removeNewMessagesAlert(chatId))
+    return() => {
+      setMessage("")
+      setMessages([])
+      setOldMessages([])
+      setPage(1)
+    }
+  }, [chatId])
+
+  useEffect(() => {
+    if(!chatDetails.data?.chat) return navigate("/")
+  }, [chatDetails.data])
+
+  useEffect(() => {
+    if(bottomRef.current) bottomRef.current.scrollIntoView({ behavior: "smooth"})
+  }, [messages])
+
   const newMessagesListener = useCallback((data) => {
     if(data.chatId !== chatId) return
+    console.log("message alert-->",data.message)
 
     setMessages((prev) => [...prev, data.message])
   }, [chatId])
@@ -76,23 +96,6 @@ const Chat= ({chatId}) => {
 
     setUserTyping(false)
   }, [chatId])
-
-  const alertListener = useCallback((message) => {
-    const messageForAlert = {
-      message,
-      senderId: {
-        _id: uuid(),
-        fullName: "Admin"
-      },
-      chatId: chatId,
-      createdAt: new Date().toISOString()
-    }
-
-    console.log("alert-->",messageForAlert)
-
-    setMessages((prev) => [...prev, messageForAlert])
-  }, [chatId])
-
 
 
   const chatInputHandler = (e) => {
@@ -111,11 +114,32 @@ const Chat= ({chatId}) => {
     }, [2000])
   }
 
+  
+  const alertListener = useCallback((data) => {
+    if(data.chatId !== chatId) return
+    console.log("alert data-->", data)
+    const messageForAlert = {
+      message: data.message,
+      senderId: {
+          _id: "bdwjdhwhdhk",
+          fullName: "Admin",
+          profile: "hkwhd"
+      },
+      chat: data.chatId,
+      createdAt: new Date().toISOString()
+  }
+
+    console.log("alert-->",messageForAlert)
+
+    setMessages((prev) => [...prev, messageForAlert])
+    console.log("messages after alert-->",messages)
+  }, [chatId])
+
   const eventHandler = {
+    [ALERT]: alertListener,
     [NEW_MESSAGE] : newMessagesListener,
     [START_TYPING] : startTypingListener,
     [STOP_TYPING] : stopTypingListener,
-    [ALERT]: alertListener,
   }
 
   useSocketEvents(socket, eventHandler)
@@ -123,20 +147,6 @@ const Chat= ({chatId}) => {
   useErrors(errors)
 
   const allMessages = [...oldMessages, ...messages]
-
-  useEffect(() => {
-    dispatch(removeNewMessagesAlert(chatId))
-    return() => {
-      setMessage("")
-      setMessages([])
-      setOldMessages([])
-      setPage(1)
-    }
-  }, [chatId])
-
-  useEffect(() => {
-    if(bottomRef.current) bottomRef.current.scrollIntoView({ behavior: "smooth"})
-  }, [messages])
 
 
   return chatDetails.isLoading ? (<Skeleton></Skeleton>) : (

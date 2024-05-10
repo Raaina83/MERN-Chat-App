@@ -1,4 +1,4 @@
-import { Grid, IconButton, Tooltip, Box, Drawer, Stack, Typography, AvatarGroup, Avatar, TextField, Button } from '@mui/material'
+import { Grid, IconButton, Tooltip, Box, Drawer, Stack, Typography, AvatarGroup, Avatar, TextField, Button, CircularProgress } from '@mui/material'
 import React, { Suspense, useEffect, useState } from 'react'
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import {useNavigate, useSearchParams } from 'react-router-dom';
@@ -10,7 +10,7 @@ import DoneIcon from '@mui/icons-material/Done';
 import ConfirmDeleteDialog from '../../components/dialogs/ConfirmDeleteDialog';
 import AddMemberDialog from '../../components/dialogs/AddMemberDialog';
 import UserItem from '../../components/specific/UserItem';
-import { useAddGroupMemberMutation, useChatDetailsQuery, useMyGroupsQuery, useRemoveGroupMemberMutation, useRenameGroupMutation } from '../../redux/api/api';
+import { useAddGroupMemberMutation, useChatDetailsQuery, useDeleteGroupMutation, useMyGroupsQuery, useRemoveGroupMemberMutation, useRenameGroupMutation } from '../../redux/api/api';
 import {useAsyncMutationHook, useErrors} from '../../hooks/hooks'
 import {LayoutLoader} from '../../components/layout/Layout'
 import { useDispatch, useSelector } from 'react-redux';
@@ -31,6 +31,8 @@ function Group() {
   const [updateGroup, isLoadingGroupName] = useAsyncMutationHook(useRenameGroupMutation)
 
   const [removeMember, isLoadingRemoveMember] = useAsyncMutationHook(useRemoveGroupMemberMutation)
+
+  const [deleteGroup, isLoadingDeleteGroup] = useAsyncMutationHook(useDeleteGroupMutation)
 
   const error = [
     {
@@ -110,21 +112,9 @@ function Group() {
   }
 
   const deleteHandler = () => {
-
+    deleteGroup("Deleting Group...", chatId)
+    closeConfirmDeleteHandler()
   }
-
-  // useEffect(()=> {
-  //   if(chatId){
-  //     setGroupName(`Group Name ${chatId}`)
-  //     setUpdatedGroupName(`New name ${chatId}`)
-  //   }
-
-  //   return () => {
-  //     setGroupName("")
-  //     setUpdatedGroupName("")
-  //     setIsEdit(false)
-  //   }
-  // }, [chatId])
 
   const IconBtns = <>
   <Box sx={{
@@ -248,7 +238,7 @@ function Group() {
             spacing={"2rem"}
             height={"50vh"}
             overflow={"auto"}
-            >{groupDetails?.data?.chat?.participants.map((user) => (
+            >{isLoadingRemoveMember? <CircularProgress/> : groupDetails?.data?.chat?.participants.map((user) => (
                 <UserItem 
                   user={user} 
                   isAdded 

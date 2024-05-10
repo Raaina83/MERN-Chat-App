@@ -51,8 +51,6 @@ app.use("/api/v1/auth", auth)
 app.use("/api/v1/users", user)
 app.use("/api/v1/chat", conversation)
 
-app.use(errorMiddleware)
-
 io.use((socket, next) => {
     cookieParser()(
         socket.request, 
@@ -120,6 +118,8 @@ io.on("connection", (socket) => {
         userSocketIDs.delete(user._id.toString())
     })
 })
+
+app.use(errorMiddleware)
 
 server.listen(PORT,() =>{
     connectToMongoDB();

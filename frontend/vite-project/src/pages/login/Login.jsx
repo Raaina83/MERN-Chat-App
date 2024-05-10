@@ -1,31 +1,55 @@
 import React, { useEffect, useState } from 'react'
 import { Link, Navigate } from 'react-router-dom'
-import useLogin from "../../hooks/useLogin.js"
 import toast from 'react-hot-toast';
 import axios from 'axios';
 import { useDispatch } from 'react-redux';
-import { userExists, userNotExists } from '../../redux/reducers/auth.js';
+import { userExists } from '../../redux/reducers/auth.js';
 
 function Login() {
   const [userName, setUsername] = useState("");
   const [password, setPassword] = useState("");
+
+  const [isLoading, setIsLoading] = useState(false)
+
   const dispatch = useDispatch()
 
-  const {loading, login} = useLogin();
+  // const {loading, login} = useLogin();
 
   const handleSubmit = async(e) =>{
     e.preventDefault();
+    const toastId = toast.loading("Logging In...");
 
-    login(userName, password)
+    setIsLoading(true);
+    const config = {
+      withCredentials: true,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+
+    try {
+      const { data } = await axios.post(
+        `http://localhost:5000/api/v1/auth/login`,
+        {
+          userName,
+          password,
+        },
+        config
+      );
+      dispatch(userExists(data.user));
+      toast.success(data.message, {
+        id: toastId,
+      });
+    } catch (error) {
+      console.log(error)
+      toast.error(error?.response?.data?.message || "Something Went Wrong", {
+        id: toastId,
+      });
+    } finally {
+      setIsLoading(false);
+    }
   }
 
-  useEffect(() => {
-    const loggedInUser = localStorage.getItem("chat-user")
-    if(loggedInUser) {
-      const user = JSON.parse(loggedInUser)
-      dispatch(userExists(user))
-    }
-  }, [])
 
   return (
     <>
@@ -94,7 +118,7 @@ function Login() {
                 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-
                 offset-2 focus-visible:outline-indigo-600"
               >
-                {loading? <span className='loading loading-spinner'></span>: "Sign in"}
+                {isLoading? <span className='loading loading-spinner'></span>: "Sign in"}
               </button>
             </div>
           </form>

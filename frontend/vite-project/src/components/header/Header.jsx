@@ -4,7 +4,6 @@ import { IoMdAdd } from "react-icons/io";
 import { FaUserGroup } from "react-icons/fa6";
 import { FaSearch } from "react-icons/fa";
 import { FiLogOut } from "react-icons/fi";
-import useLogout from '../../hooks/useLogout';
 import { FaBars } from "react-icons/fa6";
 import { useNavigate } from 'react-router-dom';
 import SearchDialog from '../specific/SearchDialog';
@@ -15,6 +14,9 @@ import { setIsMobileMenu, setIsNotification, setIsSearch, setIsNewGroup } from '
 import { useDispatch, useSelector } from 'react-redux';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import { resetNotification } from '../../redux/reducers/chat';
+import axios from 'axios';
+import toast from 'react-hot-toast';
+import { userNotExists } from '../../redux/reducers/auth';
 
 
 function Header() {
@@ -22,11 +24,24 @@ function Header() {
   const { notificationsCount} = useSelector((state) => state.chat)
   const {isNewGroup} = useSelector((state) => state.misc)
 
-  const {loading, logout}  = useLogout()
+  // const {loading, logout}  = useLogout()
   const navigate = useNavigate()
 
   // const [isNewGroup, setIsNewGroup] = useState(false)
   const dispatch = useDispatch()
+
+  const logoutHandler = async() => {
+    try {
+      const {data} = await axios.get(`http://localhost:5000/api/v1/auth/logout`, {
+        withCredentials: true
+      })
+      dispatch(userNotExists())
+      toast.success(data.message)
+    } catch (error) {
+      console.log(error)
+      toast.error(error?.response?.data?.message || "Something went wrong")
+    }
+  }
 
   const openSearch = () => dispatch(setIsSearch(true))
  
@@ -67,7 +82,7 @@ function Header() {
           </div>
           <div className='px-4'><IoMdAdd className='h-6 w-6 cursor-pointer' onClick={openNewGroup}/></div>
           <div className='px-4' ><FaUserGroup className='h-6 w-6 cursor-pointer' onClick={navigateToGroup}/></div>
-          <div className='px-4' ><FiLogOut className='h-6 w-6 me-4 cursor-pointer' onClick={logout}/></div> 
+          <div className='px-4' ><FiLogOut className='h-6 w-6 me-4 cursor-pointer' onClick={logoutHandler}/></div> 
         </div>
         </div>
         {isSearch && (

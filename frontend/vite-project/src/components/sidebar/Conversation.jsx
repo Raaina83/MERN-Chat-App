@@ -1,22 +1,10 @@
 import React from 'react'
-import useConversation from '../../zustand/useConversation'
-import { useParams } from 'react-router-dom'
 
 
 function Conversation({conversation}) {
-  // const {selectedConversation, setSelectedConversation} = useConversation()
 
-  // const isSelected = selectedConversation?._id === conversation._id
-
-  // useEffect(() => {
-
-  //   return (() => {
-  //     setSelectedConversation(null)
-  //   })
-  // }, [])
   return (
     <div className={`hover:bg-gray-300  h-[75px] w-full my-2 `}
-    // onClick={() => {setSelectedConversation(conversation)}}
     >
     <div className='flex h-full pt-2 ps-2'>
         <div className='avatar online rounded-full w-[50px] h-[50px] mx-2'>

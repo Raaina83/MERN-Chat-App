@@ -1,6 +1,5 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom"
 import {Toaster} from "react-hot-toast"
-import { useAuthContext } from "./context/AuthContext"
 import { useDispatch, useSelector } from "react-redux"
 import { SocketProvider } from "./socket"
 import ProtectRoute from "./components/auth/ProtectRoute"
@@ -22,8 +21,10 @@ function App() {
 
   useEffect(() => {
     axios
-      .get(`localhost:5173/api/v1/user/me`, { withCredentials: true })
-      .then(({ data }) => dispatch(userExists(data.data)))
+      .get("http://localhost:5000/api/v1/users/me", { withCredentials: true })
+      .then(({ data }) => {
+        dispatch(userExists(data.user))
+      })
       .catch((err) => dispatch(userNotExists()));
   }, [dispatch]);
 

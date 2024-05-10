@@ -1,6 +1,10 @@
 import React, { useState } from 'react'
 import GenderCheckbox from './GenderCheckbox';
 import useSignup from '../../hooks/useSignup';
+import toast from 'react-hot-toast';
+import axios from 'axios';
+import { useDispatch } from 'react-redux';
+import { userExists } from '../../redux/reducers/auth';
 
 function Signup() {
   const [inputs, setInputs] = useState({
@@ -12,7 +16,11 @@ function Signup() {
     email: ""
   })
 
-  const {loading, signup} = useSignup()
+  const [isLoading, setIsLoading] = useState(false)
+
+  const dispatch = useDispatch()
+
+  // const {loading, signup} = useSignup()
 
   const handleCheckboxChange = (gender) =>{
     setInputs({...inputs, gender})
@@ -20,7 +28,31 @@ function Signup() {
 
   const handleSubmit = async(e) =>{
     e.preventDefault();
-    await signup(inputs);
+    
+    const toastId = toast.loading("Signing up...")
+    setIsLoading(true)
+
+    const config = {
+      withCredentials: true,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+
+    try {
+      const {data} = await axios.post(`http://localhost:5000/api/v1/auth/signup`, inputs, config)
+      dispatch(userExists(data.user))
+      toast.success(data.message, {
+        id: toastId
+      })
+    } catch (error) {
+      console.log("error-->",error)
+      toast.error(error?.response?.data?.message || "Something went wrong", {
+        id: toastId
+      })
+    } finally {
+      setIsLoading(false)
+    }
   }
 
 
@@ -140,9 +172,9 @@ function Signup() {
                 className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6
                  text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 
                  focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                 disabled={loading}
+                 disabled={isLoading}
               >
-                {loading? <span className='loading loading-spinner'></span> : "Sign Up"}
+                {isLoading? <span className='loading loading-spinner'></span> : "Sign Up"}
               </button>
             </div>
           </form>

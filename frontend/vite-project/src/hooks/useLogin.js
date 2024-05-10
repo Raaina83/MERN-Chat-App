@@ -24,6 +24,8 @@ const useLogin = () =>{
 
             const data = await res.json()
 
+            console.log(data)
+
             if(data.error){
                 dispatch(userNotExists())
                 throw new Error(data.error)
@@ -33,9 +35,10 @@ const useLogin = () =>{
             console.log(data)
             localStorage.setItem("chat-user", JSON.stringify(data))
             // setAuthUser(data)
-            toast.success("Logged in successfully")
+            toast.success(data.message)
 
         } catch (error) {
+            console.log(error)
             toast(error.message)
         }finally{
             setLoading(false)

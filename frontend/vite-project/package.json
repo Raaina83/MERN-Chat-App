@@ -16,6 +16,7 @@
     "@mui/material": "^5.15.15",
     "6pp": "^1.2.16",
     "axios": "^1.6.8",
+    "framer-motion": "^11.1.9",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-hot-toast": "^2.4.1",

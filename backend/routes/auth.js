@@ -8,6 +8,6 @@ router.post("/login", loginValidator(), validateHandlor, login);
 
 router.post("/signup", signUpValidator(), validateHandlor ,signup);
 
-router.post("/logout", protectRoute, logout);
+router.get("/logout", protectRoute, logout);
 
 export default router;

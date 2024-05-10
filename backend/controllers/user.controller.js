@@ -5,12 +5,21 @@ import {getOtherMembers} from "../lib/helper.js";
 import { emitEvent } from "../utils/features.js";
 import { NEW_REQUEST, REFETCH_CHATS } from "../constants/events.js";
 import { ErrorHandler } from "../utils/utility.js";
+import { TryCatch } from "../middleware/error.js";
 
+const getMyProfile = TryCatch(async(req, res, next) => {
+    const user = await User.findById(req.user);
+  
+    if (!user) return next(new ErrorHandler("User not found", 404));
+  
+    res.status(200).json({
+      success: true,
+      user,
+    });
+})
 
-
-const searchUser = async(req, res, next) => {
-    try {
-        const {name = ""} = req.query
+const searchUser = TryCatch(async(req, res, next) => {
+    const {name = ""} = req.query
 
         const myChats = await Conversation.find({ groupChat: false, participants: req.user._id})
 
@@ -27,21 +36,14 @@ const searchUser = async(req, res, next) => {
             profile
         }))
 
-        res.status(200).json({
+        return res.status(200).json({
             success: true,
             users
         })
-        
-    } catch (error) {
-        console.log("Error in searchUser controller", error)
-        next(error)
-        // res.status(500).json({error: "Internal server Error"})
-    }
-}
+})
 
-const sendFriendRequest = async(req, res, next) => {
-    try {
-        const {userId} = req.body
+const sendFriendRequest = TryCatch(async(req, res, next) => {
+    const {userId} = req.body
 
         const request = await Request.findOne({
             $or:[
@@ -52,7 +54,6 @@ const sendFriendRequest = async(req, res, next) => {
 
         if(request) {
             return next(new ErrorHandler("Request already exists", 400))
-            // throw new Error("Request already exists")
         }
     
         await Request.create({
@@ -60,26 +61,16 @@ const sendFriendRequest = async(req, res, next) => {
             receiverId: userId
         })
 
-        // console.log("req controller-->",req)
         emitEvent(req, NEW_REQUEST, [userId])
 
         return res.status(200).json({
             success: true,
             message: "Friend Request Sent"
         })
-    } catch (error) {
-        console.log("Error in sendFriendRequest controller", error)
-        next(error)
-        // return res.status(500).json({
-        //     success: false,
-        //     message: error.message
-        // })
-    }
-}
+})
 
-const acceptFriendRequest = async(req, res, next) => {
-    try {
-        const {requestId, accept} = req.body
+const acceptFriendRequest = TryCatch(async(req, res, next) => {
+    const {requestId, accept} = req.body
 
         const request = await Request.findById(requestId)
         .populate("senderId", "fullName profile")
@@ -114,20 +105,10 @@ const acceptFriendRequest = async(req, res, next) => {
             message: "Friend Request accepted",
             senderId: request.senderId._id
         })
+})
 
-    } catch (error) {
-        console.log("Error in acceptFriendRequest controller", error)
-        next(error)
-        // return res.status(500).json({
-        //     success: false,
-        //     message: error.message
-        // })
-    }
-}
-
-const notifications = async(req, res, next) => {
-    try {
-        const requests = await Request.find({ receiverId: req.user._id }).populate("senderId", "fullName profile")
+const notifications = TryCatch(async(req, res, next) => {
+    const requests = await Request.find({ receiverId: req.user._id }).populate("senderId", "fullName profile")
 
         const allRequests = requests.map(({_id, senderId}) => ({
             _id,
@@ -142,20 +123,10 @@ const notifications = async(req, res, next) => {
             success: true,
             requests: allRequests
         })
+})
 
-    } catch (error) {
-        console.log("Error in notification controller", error)
-        next(error)
-        // return res.status(500).json({
-        //     success: false,
-        //     message: error.message
-        // })   
-    }
-}
-
-const getMyFriends = async(req, res, next) => {
-    try {
-        const chatId = req.query.chatId
+const getMyFriends = TryCatch(async(req, res, next) => {
+    const chatId = req.query.chatId
 
         const chats = await Conversation.find({ participants: req.user._id, groupChat: false }).populate("participants", "fullName profile")
 
@@ -183,20 +154,10 @@ const getMyFriends = async(req, res, next) => {
                 friends
             })
         }
-
-         
-
-    } catch (error) {
-        console.log("Error in getMyFriends controller", error)
-        next(error)
-        // return res.status(500).json({
-        //     success: false,
-        //     message: error.message
-        // })   
-    }
-}
+})
 
 export {
+    getMyProfile,
     searchUser,
     sendFriendRequest,
     acceptFriendRequest,

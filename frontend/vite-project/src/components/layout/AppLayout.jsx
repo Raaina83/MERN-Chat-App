@@ -1,29 +1,32 @@
-import React, { useCallback, useEffect } from 'react'
-import { useParams } from 'react-router-dom'
+import React, { useCallback, useEffect, useRef } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
 import Header from '../header/Header'
 import { Grid, Drawer } from '@mui/material'
 import { useDispatch, useSelector } from 'react-redux'
 import { useMyChatsQuery } from '../../redux/api/api'
 import { useErrors, useSocketEvents } from '../../hooks/hooks'
-import { setIsMobileMenu } from '../../redux/reducers/misc'
+import { setIsDeleteMenu, setIsMobileMenu, setIsSelectedDeleteChat } from '../../redux/reducers/misc'
 import ConversationBox from '../sidebar/ConversationBox'
 import { getSocket } from '../../socket'
 import { NEW_MESSAGE_ALERT, NEW_REQUEST, REFETCH_CHATS } from '../../constants/events'
 import { incrementNotification, setNewMessagesAlert } from '../../redux/reducers/chat'
 import { getOrSaveFromStorage } from '../../lib/features'
+import DeleteChatMenu from '../dialogs/DeleteChatMenu'
 
 const AppLayout = () => (WrappedComponent) => {
     return (props) => {
         const params = useParams()
-        console.log("params-->",params)
         const chatId = params.chatId
         const socket = getSocket()
+
+        const deleteAnchor = useRef(null)
 
         const {isMobileMenu} = useSelector((state) => state.misc)
         const {newMessagesAlert}  = useSelector((state) => state.chat)
 
         const {isLoading,data,isError,error,refetch} = useMyChatsQuery("")
         const dispatch = useDispatch()
+        const navigate = useNavigate()
 
         useErrors([{isError, error}])
 
@@ -33,13 +36,13 @@ const AppLayout = () => (WrappedComponent) => {
 
         const handleMobileClose = () => dispatch(setIsMobileMenu(false))
 
-        const handleDeleteChat = (e, _id, groupChat) => {
-            e.preventDefault()
-            console.log("Delete Chat", _id, groupChat)
+        const handleDeleteChat = (e, chatId, groupChat) => {
+            dispatch(setIsDeleteMenu(true))
+            dispatch(setIsSelectedDeleteChat({chatId, groupChat}))
+            deleteAnchor.current = e.currentTarget
         }
 
         const newMessageAlertHandler = useCallback((data) => {
-            console.log("data---->data", data)
             if(data.chatId === chatId) return
 
             dispatch(setNewMessagesAlert(data))
@@ -51,7 +54,9 @@ const AppLayout = () => (WrappedComponent) => {
 
         const refetchhandler = useCallback(() => {
                 refetch()
-        }, [refetch])
+                navigate("/")
+                
+        }, [refetch, navigate])
 
         const eventHandler = {
             [NEW_MESSAGE_ALERT] : newMessageAlertHandler,
@@ -64,6 +69,8 @@ const AppLayout = () => (WrappedComponent) => {
         return (
         <div className=' h-[100vh] w-[100vw]'>
             <Header></Header>
+
+            <DeleteChatMenu dispatch={dispatch} deleteOptionAnchor={deleteAnchor}/>
 
             <Drawer open={isMobileMenu} onClose={handleMobileClose}>
                 {isLoading ? (

@@ -19,7 +19,8 @@ const protectRoute = async(req, res, next) =>{
 
         const user = await User.findById(decoded.userId).select("-password");  //userId because we signed the jwt token using userID
         if(!user){
-            return res.status(404).json({error: "User not found"});
+            return next(new ErrorHandler("User not found", 404))
+            // return res.status(404).json({error: "User not found"});
         }
         req.user = user;
 
@@ -27,7 +28,8 @@ const protectRoute = async(req, res, next) =>{
 
     } catch (error) {
         console.log("Error in middleware", error);
-        res.status(500).json({error: "Internal server Error"});
+        next(error)
+        // res.status(500).json({error: "Internal server Error"});
     }
 }
 

@@ -1,23 +1,37 @@
 const errorMiddleware = (err, req, res, next) => {
     err.message = err.message ||  "Internal server error"
-    err.status = err.status || 500
+    err.statusCode = err.statusCode || 500
 
     if(err.code === 11000){
         const error = Object.keys(err.keyPattern).join(",")
         err.message = `Duplicate field - ${error}`
-        err.status = 400
+        err.statusCode = 400
     }
 
     if(err.name === "CastError"){
         const errorPath = err.path
         err.message = `Invalid format of ${errorPath}`,
-        er.status = 400
+        err.statusCode = 400
     }
 
-    return res.status(err.status).json({
+    const response = {
         success: false,
-        message: process.env.NODE_ENV === "DEVELOPMENT" ? err : err.message
-    })
+        message: err.message,
+      };
+    
+      if (process.env.NODE_ENV === "DEVELOPMENT") {
+        response.error = err;
+      }
+    
+      return res.status(err.statusCode).json(response);
 }
 
-export {errorMiddleware}
+const TryCatch = (passedFunc) => async(req, res, next) => {
+    try {
+        await passedFunc(req, res, next)
+    } catch (error) {
+        next(error)
+    }
+}
+
+export {errorMiddleware, TryCatch}
