@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import AppLayout from '../../components/layout/AppLayout'
 import Message from '../../components/messages/Message.jsx'
-import { Skeleton, Stack, Typography } from '@mui/material'
+import { IconButton, Skeleton, Stack, Typography } from '@mui/material'
 import { RiAttachment2 } from "react-icons/ri";
 import {BsSend} from 'react-icons/bs'
 import { getSocket } from '../../socket.jsx'
@@ -13,6 +13,8 @@ import { useDispatch } from 'react-redux';
 import { removeNewMessagesAlert } from '../../redux/reducers/chat.js';
 import TypingLoader from '../../components/layout/TypingLoader.jsx';
 import { useNavigate } from 'react-router-dom';
+import AttachFileIcon from '@mui/icons-material/AttachFile';
+import SendIcon from '@mui/icons-material/Send';
 
 const Chat= ({chatId}) => {
   const containerRef = useRef(null)
@@ -71,8 +73,8 @@ const Chat= ({chatId}) => {
   }, [chatId])
 
   useEffect(() => {
-    if(!chatDetails.data?.chat) return navigate("/")
-  }, [chatDetails.data])
+    if(chatDetails.isError) return navigate("/")
+  }, [chatDetails.isError])
 
   useEffect(() => {
     if(bottomRef.current) bottomRef.current.scrollIntoView({ behavior: "smooth"})
@@ -117,15 +119,17 @@ const Chat= ({chatId}) => {
   
   const alertListener = useCallback((data) => {
     if(data.chatId !== chatId) return
+
     console.log("alert data-->", data)
     const messageForAlert = {
       message: data.message,
+      _id: "chcioehiwhnj",
       senderId: {
           _id: "bdwjdhwhdhk",
           fullName: "Admin",
           profile: "hkwhd"
       },
-      chat: data.chatId,
+      chat: chatId,
       createdAt: new Date().toISOString()
   }
 
@@ -151,14 +155,13 @@ const Chat= ({chatId}) => {
 
   return chatDetails.isLoading ? (<Skeleton></Skeleton>) : (
     <>
-    <Stack ref={containerRef} overflow={"auto"} height={"90%"}>
-      {/* {!oldMessagesChunk.isLoading && oldMessagesChunk?.data?.messages?.map((message) => <Message message={message} key={message._id}/>)} */}
+    <Stack ref={containerRef} height={"90%"} 
+    sx={{
+      overflowX: "hidden",
+      overflowY: "auto"
+    }}>
 
-      {allMessages.length > 0 ? (
-        allMessages.map((message) => <Message message={message} key={message._id}/>)
-        ) : (
-        <Typography textAlign={"center"} padding={"1rem"}>Send a Message to start conversation</Typography>
-        )}
+      {allMessages.map((message) => <Message message={message} key={message._id}/>)}
 
         {userTyping && <TypingLoader/>}
 
@@ -166,8 +169,52 @@ const Chat= ({chatId}) => {
 
     </Stack>
 
+    <form
+    style={{
+      height:"10%",
+    }}
+    onSubmit={handleSubmit}>
+      <Stack
+      display={"flex"}
+      direction={"row"}
+      position={"relative"}
+      height={"100%"}
+      padding={"0.5rem"}
+      alignItems={"center"}
+      justifyContent={"center"}
+      style={{
+        backgroundColor: "rgb(203 213 225)"
+      }}>
+        <IconButton
+        sx={{
+          position: 'absolute',
+          left: "7.3rem",
+          rotate: "30deg"
+        }}>
+          <AttachFileIcon/>
+        </IconButton>
+        <input
+        style={{
+          width: "80%",
+          height: "100%",
+          border: "none",
+          padding: "0 3.5rem",
+          borderRadius: "0.5rem",
+        }}
+        value={message}
+        onChange={chatInputHandler}/>
+        <IconButton
+        sx={{
+          position: "absolute",
+          right: "7rem"
+        }}>
+          <SendIcon/>
+        </IconButton>
+      </Stack>
+    </form>
 
-      <form className='flex bg-slate-100 p-4 absolute w-[66.6%] h-[10%] bottom-0' onSubmit={handleSubmit}>
+
+      {/* <form className='flex bg-slate-100 p-4 absolute w-[66.6%] h-[10%] bottom-0' onSubmit={handleSubmit}>
         <div className='w-[70%] relative m-auto flex justify-center items-center'>
           <button className='absolute start-4'><RiAttachment2/></button>
         <input
@@ -176,14 +223,12 @@ const Chat= ({chatId}) => {
         className=' rounded-md p-2 w-full ps-[4rem] text-black'
         value={message}
         onChange={chatInputHandler}
-        // onChange={handler}
         />
         <button className=' absolute inset-y-0 end-4' type='submit'>
           <BsSend/>
-            {/* {loading? <span className='loading loading-spinner'></span> : <BsSend/>} */}
         </button>
         </div>
-      </form>
+      </form> */}
     
     </>
   ) 

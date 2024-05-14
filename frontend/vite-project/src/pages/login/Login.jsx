@@ -1,25 +1,68 @@
-import React, { useEffect, useState } from 'react'
-import { Link, Navigate } from 'react-router-dom'
+import React, { useState } from 'react'
 import toast from 'react-hot-toast';
 import axios from 'axios';
-import { useDispatch } from 'react-redux';
 import { userExists } from '../../redux/reducers/auth.js';
+import Typography from '@mui/material/Typography';
+import Container from '@mui/material/Container';
+import { Button, Checkbox, FormControl, FormControlLabel, FormGroup, FormLabel, Paper, Radio, RadioGroup, Stack, TextField } from '@mui/material';
+import { useDispatch } from 'react-redux';
 
-function Login() {
-  const [userName, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-
+const Login = ()=> {
+  const [isLogin, setIsLogin] = useState(true)
   const [isLoading, setIsLoading] = useState(false)
 
   const dispatch = useDispatch()
 
-  // const {loading, login} = useLogin();
+  const [userName, setUsername] = useState("")
+  const [password, setPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
+  const [fullName, setFullName] = useState("")
+  const [gender, setGender] = useState("")
+  const [email, setEmail] = useState("")
+
+  const toggleLogin = () =>  setIsLogin((prev) => !prev)
 
   const handleSubmit = async(e) =>{
-    e.preventDefault();
-    const toastId = toast.loading("Logging In...");
+        e.preventDefault();
+        const toastId = toast.loading("Logging In...");
+    
+        setIsLoading(true);
+        const config = {
+          withCredentials: true,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        };
+    
+        try {
+          const { data } = await axios.post(
+            `http://localhost:5000/api/v1/auth/login`,
+            {
+              userName,
+              password,
+            },
+            config
+          );
+          dispatch(userExists(data.user));
+          toast.success(data.message, {
+            id: toastId,
+          });
+        } catch (error) {
+          console.log(error)
+          toast.error(error?.response?.data?.message || "Something Went Wrong", {
+            id: toastId,
+          });
+        } finally {
+          setIsLoading(false);
+        }
+  }
 
-    setIsLoading(true);
+  const handleSignUp = async(e) =>{
+    e.preventDefault();
+    
+    const toastId = toast.loading("Signing up...")
+    setIsLoading(true)
+
     const config = {
       withCredentials: true,
       headers: {
@@ -28,110 +71,198 @@ function Login() {
     };
 
     try {
-      const { data } = await axios.post(
-        `http://localhost:5000/api/v1/auth/login`,
-        {
-          userName,
-          password,
-        },
-        config
-      );
-      dispatch(userExists(data.user));
+      const inputs = {
+        fullName: fullName,
+        userName: userName,
+        password: password,
+        confirmPassword: confirmPassword,
+        gender: gender,
+        email: email,
+      }
+      const {data} = await axios.post(`http://localhost:5000/api/v1/auth/signup`, inputs, config)
+      dispatch(userExists(data.user))
       toast.success(data.message, {
-        id: toastId,
-      });
+        id: toastId
+      })
     } catch (error) {
-      console.log(error)
-      toast.error(error?.response?.data?.message || "Something Went Wrong", {
-        id: toastId,
-      });
+      console.log("error-->",error)
+      toast.error(error?.response?.data?.message || "Something went wrong", {
+        id: toastId
+      })
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
   }
-
-
+  
   return (
-    <>
-    <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
-        <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-          <img
-            className="mx-auto h-10 w-auto"
-            src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
-            alt="Your Company"
-          />
-          <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
-            Sign in to your account
-          </h2>
-        </div>
-
-        <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-          <form className="space-y-6" onSubmit={handleSubmit}>
-            <div>
-              <label htmlFor="userName" className="block text-sm font-medium leading-6 text-gray-900">
-                Username
-              </label>
-              <div className="mt-2">
-                <input
-                  id="userName"
-                  name="userName"
-                  type="text"
-                  required
+    <div>
+      <Container component={"main"}
+      maxWidth={"xs"}
+      sx={{
+        height: "100vh",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+      }}>
+        <Paper 
+          elevation={4}
+          sx={{
+            display: 'flex',
+            padding: 4,
+            flexDirection: "column",
+            alignItems: "center",
+          }}>
+          { isLogin ? (
+            <>
+              <Typography variant='h5'>Login</Typography>
+              <form 
+                style={{
+                  width: "100%",
+                  display: "flex",
+                  flexDirection: "column",
+                  padding: 4,
+                  margin: "1rem"
+                }}
+                onSubmit={handleSubmit}>
+                <TextField 
+                  id="outlined-basic" 
+                  label="Username" 
+                  variant="outlined"
+                  value={userName}
                   onChange={(e) => setUsername(e.target.value)}
-                  className="block w-full rounded-md border-0 px-2 py-1.5 text-white shadow-sm ring-1 ring-inset
-                   ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 
-                   sm:text-sm sm:leading-6"
-                />
-              </div>
-            </div>
+                  margin='normal'/>
 
-            <div>
-              <div className="flex items-center justify-between">
-                <label htmlFor="password" className="block text-sm font-medium leading-6 text-white">
-                  Password
-                </label>
-                <div className="text-sm">
-                  <a href="#" className="font-semibold text-indigo-600 hover:text-indigo-500">
-                    Forgot password?
-                  </a>
-                </div>
-              </div>
-              <div className="mt-2">
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  autoComplete="current-password"
-                  required
+                <TextField 
+                  id="outlined-basic" 
+                  label="Password" 
+                  variant="outlined"
+                  value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="block w-full rounded-md border-0 px-2 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset 
-                  ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm 
-                  sm:leading-6"
-                />
-              </div>
-            </div>
+                  margin='normal'/>
 
-            <div>
-              <button
-                type="submit"
-                className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 
-                text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-
-                offset-2 focus-visible:outline-indigo-600"
+                  <Button 
+                    type='submit'
+                    sx={{
+                      marginTop: "1rem"
+                    }}
+                    variant='contained'
+                    color='primary'
+                    fullWidth>
+                    Login
+                  </Button>
+
+                  <Typography textAlign={"center"} m={"1rem"}>OR</Typography>
+
+                  <Button 
+                    variant='text'
+                    fullWidth
+                    onClick={toggleLogin}
+                    disabled={isLoading}>
+                    SignUp Instead
+                  </Button>
+              </form>
+
+            </>
+          ) : (
+            <>
+            <Typography variant='h5'>Sign Up</Typography>
+            <form
+            style={{
+              width: "100%",
+              display: "flex",
+              flexDirection: "column",
+              padding: 4,
+              margin: "1rem"
+            }}
+             onSubmit={handleSignUp}>
+
+              <Stack 
+              display={"flex"}
+              width={"100%"}
+              flexDirection={"row"}
               >
-                {isLoading? <span className='loading loading-spinner'></span>: "Sign in"}
-              </button>
-            </div>
-          </form>
+              <TextField 
+                  id="outlined-basic" 
+                  label="Fullname" 
+                  variant="outlined"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  margin='normal'
+                  sx={{
+                    paddingRight: "1rem"
+                  }}/>
+              <TextField 
+                  id="outlined-basic" 
+                  label="Username" 
+                  variant="outlined"
+                  value={userName}
+                  onChange={(e) => setUsername(e.target.value)}
+                  margin='normal'/>
+              </Stack>
+              
+        
+              <TextField 
+                  id="outlined-basic" 
+                  label="Password" 
+                  variant="outlined"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  margin='normal'/>
+              <TextField 
+                  id="outlined-basic" 
+                  label="Confirm Password" 
+                  variant="outlined"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  margin='normal'/>
+              <TextField 
+                  id="outlined-basic" 
+                  label="Email" 
+                  variant="outlined"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  margin='normal'/>
+                  
+              <FormControl sx={{
+                margin: "1rem 0 0 1rem"
+              }}>
+              <FormLabel>Gender</FormLabel>
+              <RadioGroup
+                row
+                defaultValue="female"
+                name="radio-buttons-group"
+                value={gender}
+                onChange={(e) => setGender(e.target.value)}
+              >
+                <FormControlLabel value="female" control={<Radio />} label="Female" />
+                <FormControlLabel value="male" control={<Radio />} label="Male" />
+                <FormControlLabel value="other" control={<Radio />} label="Other" />
+              </RadioGroup>
+            </FormControl>
 
-          <p className="mt-10 text-center text-sm text-gray-500">
-            Not a member?{' '}
-            <Link to="/signup" className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">
-              Register Now!
-            </Link>
-          </p>
-        </div>
-      </div>
-    </>
+            <Button
+              variant='contained'
+              sx={{
+                marginTop: "1rem"
+              }}
+              disabled={isLoading}
+              fullWidth
+              type='submit'>
+              Sign Up
+            </Button>
+            <Typography textAlign={"center"} margin={"1rem"}>OR</Typography>
+
+            <Button onClick={toggleLogin}>
+              Login Instead
+            </Button>
+            </form>
+            
+            </>
+          )}
+        </Paper>
+      </Container>
+    </div>
+
   )
 }
 

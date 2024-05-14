@@ -23,7 +23,7 @@ const userSchema = new Schema({
     gender:{
         type: String,
         required: true,
-        enum: ["male", "female"]
+        enum: ["male", "female", "other"]
     },
     profile:{
         type: String,

@@ -10,12 +10,10 @@ import { userExists, userNotExists } from "./redux/reducers/auth"
 
 const Home = lazy(() => import('./pages/home/Home'))
 const Login = lazy(() => import('./pages/login/Login'))
-const Signup = lazy(() => import('./pages/signup/Signup'))
 const Chat = lazy(() => import('./pages/chat/Chat'))
 const Group = lazy(() => import('./pages/group/Group'))
 
 function App() {
-  // const {authUser} = useAuthContext()
   const {user} = useSelector(state => state.auth)
   const dispatch = useDispatch()
 
@@ -50,7 +48,6 @@ function App() {
               </ProtectRoute>
             }
           />
-    <Route path="/signup" element={user? <Navigate to="/"/> : <Signup/>}></Route>
     </Routes>
     <Toaster/>
     </Suspense>

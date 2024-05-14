@@ -14,6 +14,9 @@ function Message({message}) {
   return (
     <>
     <motion.div className={`chat ${chatClassName}`}
+    style={{
+        backgroundColor: "rgb(248 250 252)"
+    }}
     initial={{opacity: 0, x: "-100%"}}
     whileInView={{opacity: 1, x: 0}}>
         <div className="chat-image avatar">

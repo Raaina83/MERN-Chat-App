@@ -28,6 +28,7 @@ const login = TryCatch(async (req, res, next) => {
 
 const signup = TryCatch(async(req, res, next) => {
     const {fullName, userName, password, confirmPassword ,email, gender} = req.body;
+    console.log(fullName, userName, password, confirmPassword, email, gender)
 
         if(password !== confirmPassword){
             return next(new ErrorHandler("Passwords does not match", 400))
@@ -44,7 +45,6 @@ const signup = TryCatch(async(req, res, next) => {
 
         const boyProfile = `https://avatar.iran.liara.run/public/boy?username=${userName}`;
         const girlProfile = `https://avatar.iran.liara.run/public/girl?username=${userName}`;
-
         const newUser = new User({
             fullName: fullName,
             userName: userName,
