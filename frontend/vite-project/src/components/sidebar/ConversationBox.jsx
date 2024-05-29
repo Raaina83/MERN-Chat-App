@@ -1,7 +1,6 @@
 import React from 'react'
-import Conversation from './Conversation'
-import {useMyChatsQuery} from '../../redux/api/api'
 import ChatItem from '../shared/ChatItem'
+import { Stack } from '@mui/material'
 
 function ConversationBox({
   chats = [],
@@ -16,13 +15,14 @@ function ConversationBox({
   handleDeleteChat
 }) {
   return (
-    <div id='conversation-box' className='h-[100%] overflow-auto'>
+    <Stack height={"100%"} overflow={"auto"}>
       { chats?.map((data, index) =>{
         const newMessageAlert  = newMessagesAlert.find(
           ({chatId}) => chatId === data._id
         )
 
-        const isOnline = data.participants.some((member) => onlineUsers.includes(member))
+        const isOnline = data?.participants?.some((member) => onlineUsers.includes(member))
+        console.log("isonlinme",isOnline)
 
         return (<ChatItem 
           name= {data.name[0]}
@@ -37,7 +37,7 @@ function ConversationBox({
           handleDeleteChat={handleDeleteChat}
         />)
       })}
-  </div>
+  </Stack>
   )
 }
 

@@ -224,7 +224,7 @@ const Login = ()=> {
                   margin='normal'/>
                   
               <FormControl sx={{
-                margin: "1rem 0 0 1rem"
+                margin: "0.5rem 0 0 1rem"
               }}>
               <FormLabel>Gender</FormLabel>
               <RadioGroup
@@ -243,14 +243,15 @@ const Login = ()=> {
             <Button
               variant='contained'
               sx={{
-                marginTop: "1rem"
+                marginTop: "0.5rem"
               }}
               disabled={isLoading}
               fullWidth
               type='submit'>
               Sign Up
             </Button>
-            <Typography textAlign={"center"} margin={"1rem"}>OR</Typography>
+            
+            <Typography textAlign={"center"} margin={"1rem 0 0.5rem 0"}>OR</Typography>
 
             <Button onClick={toggleLogin}>
               Login Instead

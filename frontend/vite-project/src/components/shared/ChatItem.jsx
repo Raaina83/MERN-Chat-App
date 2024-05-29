@@ -1,4 +1,4 @@
-import { Stack, Typography } from '@mui/material'
+import { Box, Stack, Typography } from '@mui/material'
 import React, { memo } from 'react'
 import { Link } from 'react-router-dom'
 import useConversation from '../../zustand/useConversation'
@@ -15,8 +15,7 @@ function ChatItem({
     index = 0,
     handleDeleteChat
 }) {
-    const {selectedConversation, setSelectedConversation} = useConversation()
-    const isSelected = selectedConversation?._id === _id
+  
   return (
     <Link 
         sx={{
@@ -24,11 +23,20 @@ function ChatItem({
         }}
        to={`/chat/${_id}`} 
        onContextMenu={(e) => handleDeleteChat(e, _id, groupChat)}>
-        <motion.div className={`hover:bg-gray-300  h-[75px] w-full my-2 ${isSelected? "bg-gray-300" : ""}`}
+
+        <motion.div /*className={`hover:bg-gray-300  h-[75px] w-full my-2 ${isSelected? "bg-gray-300" : ""}`*/
         initial= {{opacity: 0, y: "-100%"}}
-        whileInView={{opacity: 1, y: 0}}>
+        whileInView={{opacity: 1, y: 0}}
+        // transition={{ delay: 0.1 * index }}
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          backgroundColor: sameSender ? "rgb(209 213 219)" : "unset",
+          padding: "1rem 0",
+          position: "relative"
+        }}>
           <div className='flex h-full pt-2 ps-2'>
-              <div className='avatar online rounded-full w-[50px] h-[50px] mx-2'>
+              <div className='avatar  rounded-full w-[50px] h-[50px] mx-2'>
                   <img src={profile[0]} className='rounded-full'></img>
               </div>
 
@@ -39,9 +47,8 @@ function ChatItem({
                   </div>
               </div>
           </div>
-      </motion.div>
 
-        {isOnline && (
+          {isOnline && (
           <Box
             sx={{
               width: "10px",
@@ -55,6 +62,9 @@ function ChatItem({
             }}
           />
         )}
+      </motion.div>
+
+        
     </Link>
   )
 }

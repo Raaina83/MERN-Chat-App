@@ -2,10 +2,8 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 import AppLayout from '../../components/layout/AppLayout'
 import Message from '../../components/messages/Message.jsx'
 import { IconButton, Skeleton, Stack, Typography } from '@mui/material'
-import { RiAttachment2 } from "react-icons/ri";
-import {BsSend} from 'react-icons/bs'
 import { getSocket } from '../../socket.jsx'
-import { ALERT, NEW_MESSAGE, START_TYPING, STOP_TYPING } from '../../constants/events.js'
+import { ALERT, CHAT_JOINED, CHAT_LEAVED, NEW_MESSAGE, START_TYPING, STOP_TYPING } from '../../constants/events.js'
 import { useChatDetailsQuery, useGetAllMessagesQuery } from '../../redux/api/api.js'
 import { useErrors, useSocketEvents } from '../../hooks/hooks.jsx'
 import {useInfiniteScrollTop} from '6pp'
@@ -16,7 +14,7 @@ import { useNavigate } from 'react-router-dom';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import SendIcon from '@mui/icons-material/Send';
 
-const Chat= ({chatId}) => {
+const Chat= ({chatId, user}) => {
   const containerRef = useRef(null)
   const bottomRef = useRef(null)
   const socket = getSocket()
@@ -63,12 +61,14 @@ const Chat= ({chatId}) => {
   }
 
   useEffect(() => {
+    socket.emit(CHAT_JOINED, {userId: user._id, participants})
     dispatch(removeNewMessagesAlert(chatId))
     return() => {
       setMessage("")
       setMessages([])
       setOldMessages([])
       setPage(1)
+      socket.emit(CHAT_LEAVED, {userId: user._id, participants})
     }
   }, [chatId])
 
@@ -120,7 +120,6 @@ const Chat= ({chatId}) => {
   const alertListener = useCallback((data) => {
     if(data.chatId !== chatId) return
 
-    console.log("alert data-->", data)
     const messageForAlert = {
       message: data.message,
       _id: "chcioehiwhnj",
@@ -132,11 +131,7 @@ const Chat= ({chatId}) => {
       chat: chatId,
       createdAt: new Date().toISOString()
   }
-
-    console.log("alert-->",messageForAlert)
-
     setMessages((prev) => [...prev, messageForAlert])
-    console.log("messages after alert-->",messages)
   }, [chatId])
 
   const eventHandler = {
@@ -204,6 +199,7 @@ const Chat= ({chatId}) => {
         value={message}
         onChange={chatInputHandler}/>
         <IconButton
+        type=' submit'
         sx={{
           position: "absolute",
           right: "7rem"

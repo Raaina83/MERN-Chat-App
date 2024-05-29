@@ -1,5 +1,4 @@
-import React, { Suspense, useState } from 'react'
-import { IoMdNotifications } from "react-icons/io";
+import React, { Suspense } from 'react'
 import { IoMdAdd } from "react-icons/io";
 import { FaUserGroup } from "react-icons/fa6";
 import { FaSearch } from "react-icons/fa";
@@ -17,17 +16,16 @@ import { resetNotification } from '../../redux/reducers/chat';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { userNotExists } from '../../redux/reducers/auth';
+import api from '../../redux/api/api';
+import { Helmet } from 'react-helmet-async';
 
 
 function Header() {
   const {isSearch, isNotification} = useSelector((state) => state.misc)
   const { notificationsCount} = useSelector((state) => state.chat)
   const {isNewGroup} = useSelector((state) => state.misc)
-
-  // const {loading, logout}  = useLogout()
   const navigate = useNavigate()
 
-  // const [isNewGroup, setIsNewGroup] = useState(false)
   const dispatch = useDispatch()
 
   const logoutHandler = async() => {
@@ -36,6 +34,7 @@ function Header() {
         withCredentials: true
       })
       dispatch(userNotExists())
+      dispatch(api.util.resetApiState())
       toast.success(data.message)
     } catch (error) {
       console.log(error)
@@ -63,7 +62,7 @@ function Header() {
   return (
     <div className='h-[10vh] flex items-center justify-center w-[100%] bg-slate-300'>
       <div className='w-[50%] h-[10vh] text-xl hidden font-medium sm:flex items-center justify-start ms-8'>
-      Chat App
+        Chat App
       </div>
       <div className='flex sm:hidden justify-start w-[50%] h-[10vh] items-center px-4 '>
         <IconButton onClick={handleMobile}>

@@ -108,6 +108,8 @@ const addMembers = TryCatch(async(req, res, next) => {
 
         const allUsersName = allNewMembers.map((i) => i.fullName).join(", ");
 
+        // emitEvent(req, REFETCH_CHATS, group.participants);
+
         emitEvent(
             req,
             ALERT,
@@ -118,7 +120,6 @@ const addMembers = TryCatch(async(req, res, next) => {
             }
           );
         
-          emitEvent(req, REFETCH_CHATS, group.participants);
 
         return res.status(200).json({
             success: true,
@@ -161,7 +162,7 @@ const removeMember = TryCatch(async(req, res, next) => {
             message: `${userToRemove.fullName} has been removed from the group`,
             chatId
         })
-        emitEvent(req, REFETCH_CHATS, allChatMembers)
+        // emitEvent(req, REFETCH_CHATS, allChatMembers)
 
         return res.status(200).json({
             success: true,

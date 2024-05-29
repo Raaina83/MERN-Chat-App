@@ -13,7 +13,7 @@ import {connectToMongoDB} from "./db/connectToMongodb.js";
 
 
 import cookieParser from "cookie-parser"
-import { NEW_MESSAGE, NEW_MESSAGE_ALERT, START_TYPING, STOP_TYPING } from './constants/events.js'
+import { CHAT_JOINED, CHAT_LEAVED, NEW_MESSAGE, NEW_MESSAGE_ALERT, ONLINE_USERS, START_TYPING, STOP_TYPING } from './constants/events.js'
 import {Message} from './models/message.model.js'
 import { socketAuthenticator } from './middleware/socketAuthenticator.js'
 import { getSockets } from './lib/getSocket.js'
@@ -21,6 +21,7 @@ import { errorMiddleware } from './middleware/error.js'
 // const { createSingleChats, createMessages } = require('./seeders/chats.seeder.js')
 const PORT = process.env.PORT || 5000
 const userSocketIDs = new Map() //all the active users connected
+const onlineUsers = new Set() //unique users
 
 const app = express();
 const server = createServer(app)
@@ -112,6 +113,20 @@ io.on("connection", (socket) => {
 
         const membersSocket = getSockets(participants)
         socket.to(membersSocket).emit(STOP_TYPING, {chatId})
+    })
+
+    socket.on(CHAT_JOINED, ({userId, participants}) => {
+        onlineUsers.add(userId.toString())
+
+        const membersSocket = getSockets(participants)
+        io.to(membersSocket).emit(ONLINE_USERS, Array.from(onlineUsers))
+    })
+
+    socket.on(CHAT_LEAVED, ({userId, participants}) => {
+        onlineUsers.delete(userId.toString())
+
+        const membersSocket = getSockets(participants)
+        io.to(membersSocket).emit(ONLINE_USERS, Array.from(onlineUsers))
     })
 
     socket.on("disconnect", () => {
