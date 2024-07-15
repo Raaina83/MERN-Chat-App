@@ -4,8 +4,11 @@ import axios from 'axios';
 import { userExists } from '../../redux/reducers/auth.js';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-import { Button, Checkbox, FormControl, FormControlLabel, FormGroup, FormLabel, Paper, Radio, RadioGroup, Stack, TextField } from '@mui/material';
+import { Avatar, Button, Checkbox, FormControl, FormControlLabel, FormGroup, FormLabel, IconButton, Paper, Radio, RadioGroup, Stack, TextField } from '@mui/material';
 import { useDispatch } from 'react-redux';
+import CameraAltIcon from '@mui/icons-material/CameraAlt';
+import { VisuallyHiddenInput } from '../../components/styles/StylesComponents.jsx';
+import { useFileHandler} from '6pp'
 
 const Login = ()=> {
   const [isLogin, setIsLogin] = useState(true)
@@ -17,8 +20,12 @@ const Login = ()=> {
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [fullName, setFullName] = useState("")
-  const [gender, setGender] = useState("")
+  // const [gender, setGender] = useState("")
   const [email, setEmail] = useState("")
+  const [bio, setBio] = useState("")
+  // const[profile, setProfile] = useState("")
+  const profile = useFileHandler("single")
+  // console.log("profile", profile)
 
   const toggleLogin = () =>  setIsLogin((prev) => !prev)
 
@@ -36,7 +43,7 @@ const Login = ()=> {
     
         try {
           const { data } = await axios.post(
-            `http://localhost:5000/api/v1/auth/login`,
+            `http://localhost:8080/api/v1/auth/login`,
             {
               userName,
               password,
@@ -66,20 +73,29 @@ const Login = ()=> {
     const config = {
       withCredentials: true,
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": "multipart/form-data",
       },
     };
 
+    const formData = new FormData();
+    formData.append("fullName", fullName)
+    formData.append("userName", userName)
+    formData.append("password", password)
+    formData.append("confirmPassword", confirmPassword)
+    formData.append("email", email)
+    formData.append("profile", profile.file)
+    console.log("form",formData)
     try {
-      const inputs = {
-        fullName: fullName,
-        userName: userName,
-        password: password,
-        confirmPassword: confirmPassword,
-        gender: gender,
-        email: email,
-      }
-      const {data} = await axios.post(`http://localhost:5000/api/v1/auth/signup`, inputs, config)
+      // const inputs = {
+      //   fullName: fullName,
+      //   userName: userName,
+      //   password: password,
+      //   confirmPassword: confirmPassword,
+      //   email: email,
+      //   bio: bio,
+      //   profile: profile.file
+      // }
+      const {data} = await axios.post(`http://localhost:8080/api/v1/auth/signup`, formData, config)
       dispatch(userExists(data.user))
       toast.success(data.message, {
         id: toastId
@@ -176,6 +192,42 @@ const Login = ()=> {
             }}
              onSubmit={handleSignUp}>
 
+              <Stack sx={{
+                position: "relative",
+                width: "10rem",
+                margin: "auto"
+              }}>
+                <Avatar sx={{
+                  width: "10rem",
+                  height: "10rem",
+                  objectFit: "contain"
+                }}
+                src={profile.preview}/>
+                <IconButton sx={{
+                  position: "absolute",
+                  bottom: "0",
+                  right: "0",
+                  }}
+                  component = "label">
+                  <>
+                  <CameraAltIcon/>
+                  <VisuallyHiddenInput type='file' onChange={profile.changeHandler}/>
+                  </>
+                </IconButton>
+              </Stack>
+
+              {profile.error && (
+                <Typography
+                  m={"1rem auto"}
+                  width={"fit-content"}
+                  display={"block"}
+                  color="error"
+                  variant="caption"
+                >
+                  {profile.error}
+                </Typography>
+                )}
+
               <Stack 
               display={"flex"}
               width={"100%"}
@@ -215,6 +267,13 @@ const Login = ()=> {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   margin='normal'/>
+               <TextField 
+                  id="outlined-basic" 
+                  label="Bio" 
+                  variant="outlined"
+                  value={bio}
+                  onChange={(e) => setBio(e.target.value)}
+                  margin='normal'/>
               <TextField 
                   id="outlined-basic" 
                   label="Email" 
@@ -223,7 +282,7 @@ const Login = ()=> {
                   onChange={(e) => setEmail(e.target.value)}
                   margin='normal'/>
                   
-              <FormControl sx={{
+              {/* <FormControl sx={{
                 margin: "0.5rem 0 0 1rem"
               }}>
               <FormLabel>Gender</FormLabel>
@@ -238,7 +297,7 @@ const Login = ()=> {
                 <FormControlLabel value="male" control={<Radio />} label="Male" />
                 <FormControlLabel value="other" control={<Radio />} label="Other" />
               </RadioGroup>
-            </FormControl>
+            </FormControl> */}
 
             <Button
               variant='contained'

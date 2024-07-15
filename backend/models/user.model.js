@@ -20,11 +20,6 @@ const userSchema = new Schema({
         type: String,
         required: true
     },
-    gender:{
-        type: String,
-        required: true,
-        enum: ["male", "female", "other"]
-    },
     profile:{
         public_id: {
           type: String,

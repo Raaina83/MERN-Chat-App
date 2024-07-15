@@ -214,8 +214,9 @@ const sendAttachments = TryCatch(async(req, res, next) => {
     const {chatId} = req.body
     
     const [chat, user] = await Promise.all(
-        [Conversation.findById(chatId)],
-        [User.findById(req.user._id, "username")]
+        [Conversation.findById(chatId),
+        User.findById(req.user._id, ("username _id"))
+        ]
     )
 
 

@@ -1,15 +1,23 @@
 import express from 'express'
 import dotenv from 'dotenv'
+dotenv.config()
 import { createServer } from 'http'
 import {Server} from 'socket.io'
 import {v4} from 'uuid'
 import cors from 'cors'
+import {v2 as cloudinary} from 'cloudinary'
 
 import auth from "./routes/auth.js"
 import user from "./routes/user.js"
 import conversation from "./routes/conversation.js"
 
 import {connectToMongoDB} from "./db/connectToMongodb.js";
+
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
+})
 
 
 import cookieParser from "cookie-parser"
