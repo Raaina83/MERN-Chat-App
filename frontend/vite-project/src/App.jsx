@@ -19,7 +19,7 @@ function App() {
 
   useEffect(() => {
     axios
-      .get("http://localhost:8080/api/v1/users/me", { withCredentials: true })
+      .get("http://localhost:5000/api/v1/users/me", { withCredentials: true })
       .then(({ data }) => {
         dispatch(userExists(data.user))
       })

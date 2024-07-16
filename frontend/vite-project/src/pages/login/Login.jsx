@@ -43,7 +43,7 @@ const Login = ()=> {
     
         try {
           const { data } = await axios.post(
-            `http://localhost:8080/api/v1/auth/login`,
+            `http://localhost:5000/api/v1/auth/login`,
             {
               userName,
               password,
@@ -95,7 +95,7 @@ const Login = ()=> {
       //   bio: bio,
       //   profile: profile.file
       // }
-      const {data} = await axios.post(`http://localhost:8080/api/v1/auth/signup`, formData, config)
+      const {data} = await axios.post(`http://localhost:5000/api/v1/auth/signup`, formData, config)
       dispatch(userExists(data.user))
       toast.success(data.message, {
         id: toastId

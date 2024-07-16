@@ -33,7 +33,7 @@ const searchUser = TryCatch(async(req, res, next) => {
         const users = allUsersExceptFriends.map(({ _id, fullName, profile }) => ({
             _id,
             fullName,
-            profile
+            profile: profile.url
         }))
 
         return res.status(200).json({
@@ -115,7 +115,7 @@ const notifications = TryCatch(async(req, res, next) => {
             senderId: {
                 _id: senderId._id,
                 fullName: senderId.fullName,
-                profile: senderId.profile
+                profile: senderId.profile.url
             }
         }))
 
@@ -135,7 +135,7 @@ const getMyFriends = TryCatch(async(req, res, next) => {
             return {
                 _id: otherUser._id,
                 fullName: otherUser.fullName,
-                profile: otherUser.profile
+                profile: otherUser.profile.url
             }
         })
 

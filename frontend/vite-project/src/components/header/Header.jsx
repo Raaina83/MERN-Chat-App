@@ -30,7 +30,7 @@ function Header() {
 
   const logoutHandler = async() => {
     try {
-      const {data} = await axios.get(`http://localhost:8080/api/v1/auth/logout`, {
+      const {data} = await axios.get(`http://localhost:5000/api/v1/auth/logout`, {
         withCredentials: true
       })
       dispatch(userNotExists())

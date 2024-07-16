@@ -4,7 +4,7 @@ import { TryCatch, errorMiddleware } from "../middleware/error.js";
 import {Conversation} from "../models/conversation.model.js";
 import {Message} from "../models/message.model.js";
 import {User} from "../models/user.model.js";
-import { emitEvent } from "../utils/features.js";
+import { emitEvent, uploadFilesToCloudinary } from "../utils/features.js";
 import { ErrorHandler } from "../utils/utility.js";
 
 
@@ -16,7 +16,9 @@ const newGroupChat = TryCatch(async(req, res, next) => {
             return next(ErrorHandler("Chat must have at least 3 members", 400))
         }
         const allParticipants = [...participants, req.user]
-        const profileAddress = "https://wabetainfo.com/wp-content/uploads/2022/05/WA_GROUP_FB.png"
+        const profileAddress = {
+            url: "https://wabetainfo.com/wp-content/uploads/2022/05/WA_GROUP_FB.png"
+        }
     
         await Conversation.create({
             name: name,
@@ -47,7 +49,7 @@ const getMyChat = TryCatch(async(req, res, next) => {
        return {
         _id,
         groupChat,
-        profile: groupChat? [profile] : [otherMembers.profile],
+        profile: groupChat? [profile.url] : [otherMembers.profile.url],
         name: groupChat? [name] : [otherMembers.fullName],
         participants: participants.reduce((prev, curr) => {
             if(curr._id.toString() !== req.user._id.toString()){
@@ -71,9 +73,17 @@ const getMyGroups = TryCatch(async(req, res, next) => {
         creator: req.user._id
     }).populate("participants", "fullName profile")
 
+    const groups = chats.map(( _id, groupChat, fullName, profile) => ({
+        _id,
+        // participants,
+        fullName,
+        groupChat,
+        profile: profile.url
+    }))
+
     return res.status(201).json({ 
         success: true,
-        groups: chats
+        groups
     })
 })
 
@@ -228,7 +238,7 @@ const sendAttachments = TryCatch(async(req, res, next) => {
 
     if(files.length < 1) return next(new ErrorHandler("Please provide attachments", 400))
 
-    const attachments = []
+    const attachments = await uploadFilesToCloudinary(files)
 
     const messageForDB = {
         chat: chatId,
@@ -269,6 +279,12 @@ const getChatDetails = TryCatch(async(req, res, next) =>{
         if(!chat){
             return next(ErrorHandler("Chat not found", 404))
         }
+
+        chat.participants = chat.participants.map((_id, fullName, profile) => ({
+            _id,
+            fullName,
+            profile: profile.url
+        }))
 
         return res.status(200).json({
             success: true,

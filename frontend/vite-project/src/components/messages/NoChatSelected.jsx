@@ -1,6 +1,5 @@
 import React from 'react'
 import { TiMessages } from "react-icons/ti";
-import { useAuthContext } from '../../context/AuthContext';
 import { useSelector } from 'react-redux';
 
 function NoChatSelected() {

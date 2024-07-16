@@ -13,6 +13,7 @@ import TypingLoader from '../../components/layout/TypingLoader.jsx';
 import { useNavigate } from 'react-router-dom';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import SendIcon from '@mui/icons-material/Send';
+import FileMenu from '../../components/dialogs/FileMenu.jsx'
 
 const Chat= ({chatId, user}) => {
   const containerRef = useRef(null)
@@ -216,6 +217,8 @@ const Chat= ({chatId, user}) => {
         </IconButton>
       </Stack>
     </form>
+
+    <FileMenu/>
 
 
       {/* <form className='flex bg-slate-100 p-4 absolute w-[66.6%] h-[10%] bottom-0' onSubmit={handleSubmit}>

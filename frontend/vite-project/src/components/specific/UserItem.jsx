@@ -15,7 +15,7 @@ function UserItem({user, handler, handlerIsLoading, isAdded, styling}) {
             alignItems={"center"}
             {...styling}    
         >
-            <Avatar src={user.profile}/>
+            <Avatar src={profile}/>
 
             <Typography
             variant='body1'
