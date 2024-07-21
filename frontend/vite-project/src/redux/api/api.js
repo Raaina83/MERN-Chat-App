@@ -137,6 +137,14 @@ const api = createApi({
             }),
             invalidatesTags: ["Chat"]
         }),
+        sendAttachments: builder.mutation({
+            query: (data) => ({
+                url: `chat/message`,
+                method: "POST",
+                credentials: 'include',
+                body: data
+            }),
+        }),
         // invalidateTags: ['Chat']
     }),
 })
@@ -157,5 +165,6 @@ export const {
     useRemoveGroupMemberMutation,
     useAddGroupMemberMutation,
     useDeleteGroupMutation,
-    useLeaveGroupMutation
+    useLeaveGroupMutation,
+    useSendAttachmentsMutation,
 } = api

@@ -4,7 +4,7 @@ const getOrSaveFromStorage = ({key, value, get}) => {
 
 }
 
-const fileFormat = (url= "") => {
+const fileFormat = (url= "", width = 100) => {
     const extension = url.split(".").pop() //splits after . and returns last string bit bcz pf pop
 
     if (extension === "mp4" || extension === "ogg" || extension=== "webm") return "video"

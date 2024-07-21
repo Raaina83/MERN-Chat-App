@@ -7,10 +7,12 @@ const initialState = {
     isMobileMenu: false,
     isSearch: false,
     isDeleteMenu: false,
+    isFileMenu: false,
     selectedDeleteChat: {
         chatId: "",
         groupChat: false
-    }
+    },
+    uploadingLoader: false,
 }
 
 const miscSlice = createSlice({
@@ -38,6 +40,12 @@ const miscSlice = createSlice({
         setIsSelectedDeleteChat: (state, action) => {
             state.selectedDeleteChat = action.payload
         },
+        setIsFileMenu: (state, action) => {
+            state.isFileMenu = action.payload
+        },
+        setUploadingLoader: (state, action) => {
+            state.uploadingLoader = action.payload
+        }
     }
 })
 
@@ -51,4 +59,6 @@ export const {
     setIsNotification,
     setIsSearch,
     setIsSelectedDeleteChat,
+    setIsFileMenu,
+    setUploadingLoader,
 }  = miscSlice.actions

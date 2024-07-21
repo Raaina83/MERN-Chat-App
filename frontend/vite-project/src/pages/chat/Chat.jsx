@@ -14,6 +14,7 @@ import { useNavigate } from 'react-router-dom';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import SendIcon from '@mui/icons-material/Send';
 import FileMenu from '../../components/dialogs/FileMenu.jsx'
+import { setIsFileMenu } from '../../redux/reducers/misc.js'
 
 const Chat= ({chatId, user}) => {
   const containerRef = useRef(null)
@@ -23,6 +24,7 @@ const Chat= ({chatId, user}) => {
   const [message, setMessage] = useState("")
   const [messages, setMessages] = useState("")
   const [page, setPage] = useState(1)
+  const [fileMenuAnchor, setFileMenuAnchor] = useState(null)
 
   const [IAmTyping, setIAmTyping] = useState(false)
   const [userTyping, setUserTyping] = useState(false)
@@ -51,6 +53,11 @@ const Chat= ({chatId, user}) => {
   ]
 
   const participants = chatDetails?.data?.chat?.participants
+
+  const handleFileOpen = (e) => {
+    dispatch(setIsFileMenu(true))
+    setFileMenuAnchor(e.currentTarget)
+  }
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -189,7 +196,8 @@ const Chat= ({chatId, user}) => {
           left: "0.5rem",
           rotate: "30deg",
           // zIndex: "3"
-        }}>
+        }}
+        onClick={handleFileOpen}>
           <AttachFileIcon/>
         </IconButton>
         <input
@@ -218,7 +226,7 @@ const Chat= ({chatId, user}) => {
       </Stack>
     </form>
 
-    <FileMenu/>
+    <FileMenu anchorE1={fileMenuAnchor} chatId={chatId}/>
 
 
       {/* <form className='flex bg-slate-100 p-4 absolute w-[66.6%] h-[10%] bottom-0' onSubmit={handleSubmit}>

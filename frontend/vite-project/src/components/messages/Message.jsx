@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux';
 import { motion } from "framer-motion"
 import {Box, Stack, Typography} from '@mui/material'
 import { fileFormat } from '../../lib/features';
+import RenderAttachment from '../shared/RenderAttachment';
 
 function Message({message}) {
     const {user} = useSelector(state => state.auth)
@@ -39,13 +40,15 @@ function Message({message}) {
 
          <Typography variant='caption'>{formattedTime}</Typography>
 
-        {message.attachments.length > 0 && (message.attachments.map((attachment, index) => {
+        {message.attachments?.length > 0 && (message.attachments.map((attachment, index) => {
             const url = attachment.url
             const file = fileFormat(url)
 
             return (
                 <Box key={index}>
-                     <a href='' target='_blank' download></a>
+                     <a href={url} target='_blank' download>
+                        {RenderAttachment(file, url)}
+                     </a>
                 </Box>
             )
         }))}

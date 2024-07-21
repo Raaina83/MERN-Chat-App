@@ -149,6 +149,7 @@ const Login = ()=> {
                   margin='normal'/>
 
                 <TextField 
+                  type='password'
                   id="outlined-basic" 
                   label="Password" 
                   variant="outlined"
