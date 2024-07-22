@@ -8,7 +8,8 @@ const TypingLoader = () => {
     spacing={"0.5rem"}
     direction={"row"}
     justifyContent={"center"}
-    marginBottom={"0.5rem"}>
+    marginBottom={"1rem"}
+    >
         <BouncingSkeleton variant='circular' width={15} height={15}
         sx={{
             animationDelay: "0.1s"

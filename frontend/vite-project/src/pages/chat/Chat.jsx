@@ -168,7 +168,7 @@ const Chat= ({chatId, user}) => {
 
         {userTyping && <TypingLoader/>}
 
-        <div ref={bottomRef}/>
+        <div ref={bottomRef} style={{marginBottom: "3rem"}}/>
 
     </Stack>
 
