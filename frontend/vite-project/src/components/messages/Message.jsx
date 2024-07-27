@@ -11,8 +11,7 @@ function Message({message}) {
     const formattedTime = extractTime(message.createdAt);
     const fromMe = user._id === message.senderId._id;
     const chatClassName = fromMe ? "chat-end" : "chat-start";
-    const profilePic = fromMe ? user.profile : message.senderId.profile; 
-    const name = fromMe ? user.fullName : message.senderId.fullName;
+    // const name = fromMe ? user.fullName : message.senderId.fullName;
 
   return (
     <>
@@ -26,19 +25,16 @@ function Message({message}) {
         padding: "0.5rem 0.5rem",
         borderRadius: "8px",
         width: "fit-content",
-        maxWidth: "50%"
+        maxWidth: "50%",
+        alignItems: "flex-end"
     }}
     initial={{opacity: 0, x: "-100%"}}
     whileInView={{opacity: 1, x: 0}}
     >
         <Stack>
-        {/* <Typography variant='h6'>{name}</Typography> */}
-
          <Typography variant='h6'>{message.message}</Typography>
         </Stack>
          
-
-         <Typography variant='caption'>{formattedTime}</Typography>
 
         {message.attachments?.length > 0 && (message.attachments.map((attachment, index) => {
             const url = attachment.url
@@ -53,9 +49,7 @@ function Message({message}) {
             )
         }))}
 
-        {/* <div className="chat-footer opacity-50">
-            Delivered
-        </div> */}
+        <Typography variant='caption'>{formattedTime}</Typography>
     </motion.div>
 
 </>

@@ -7,7 +7,7 @@ import { singleProfile } from '../middleware/multer.js';
 
 router.post("/login", loginValidator(), validateHandlor, login);
 
-router.post("/signup", signUpValidator(), singleProfile, validateHandlor ,signup);
+router.post("/signup", singleProfile, signUpValidator(), validateHandlor ,signup);
 
 router.get("/logout", protectRoute, logout);
 

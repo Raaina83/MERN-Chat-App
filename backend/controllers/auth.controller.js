@@ -27,8 +27,8 @@ const login = TryCatch(async (req, res, next) => {
 })
 
 const signup = TryCatch(async(req, res, next) => {
-    console.log(req.body)   
     const {fullName, userName, password, confirmPassword ,email, bio} = req.body;
+    if(password.length < 6) return next(new ErrorHandler("Password should have at least 6 digits."))
     if(bio === ""){
         bio = "New User"
     }
@@ -38,13 +38,13 @@ const signup = TryCatch(async(req, res, next) => {
 
     const result = await uploadFilesToCloudinary([file])
 
+    if(password !== confirmPassword){
+        return next(new ErrorHandler("Passwords does not match", 400))
+    }
+
     const profile = {
         public_id: result[0].public_id,
         url: result[0].url
-    }
-
-    if(password !== confirmPassword){
-        return next(new ErrorHandler("Passwords does not match", 400))
     }
 
     const user = await User.findOne({userName});

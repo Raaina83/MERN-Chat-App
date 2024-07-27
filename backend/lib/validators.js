@@ -2,7 +2,10 @@ import {body, validationResult, param, query} from "express-validator"
 import { ErrorHandler } from "../utils/utility.js"
 
 const signUpValidator = () => [
-    // body(["fullName", "userName", "password", "confirmPassword" , "email"]).notEmpty().withMessage("Please fill in all the fields")
+    body("fullName", "Please enter your Fullname").notEmpty(),
+    body("userName", "Please enter your Username").notEmpty(),
+    body("password", "Please enter your Password").notEmpty(),
+    body("email", "Please enter your Email").notEmpty(),
 ]
 
 const loginValidator = () => [

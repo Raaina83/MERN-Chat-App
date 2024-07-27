@@ -4,7 +4,7 @@ import axios from 'axios';
 import { userExists } from '../../redux/reducers/auth.js';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-import { Avatar, Button, Checkbox, FormControl, FormControlLabel, FormGroup, FormLabel, IconButton, Paper, Radio, RadioGroup, Stack, TextField } from '@mui/material';
+import { Avatar, Button, IconButton, Paper, Stack, TextField } from '@mui/material';
 import { useDispatch } from 'react-redux';
 import CameraAltIcon from '@mui/icons-material/CameraAlt';
 import { VisuallyHiddenInput } from '../../components/styles/StylesComponents.jsx';
@@ -20,12 +20,9 @@ const Login = ()=> {
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [fullName, setFullName] = useState("")
-  // const [gender, setGender] = useState("")
   const [email, setEmail] = useState("")
   const [bio, setBio] = useState("")
-  // const[profile, setProfile] = useState("")
   const profile = useFileHandler("single")
-  // console.log("profile", profile)
 
   const toggleLogin = () =>  setIsLogin((prev) => !prev)
 
@@ -86,15 +83,6 @@ const Login = ()=> {
     formData.append("profile", profile.file)
     console.log("form",formData)
     try {
-      // const inputs = {
-      //   fullName: fullName,
-      //   userName: userName,
-      //   password: password,
-      //   confirmPassword: confirmPassword,
-      //   email: email,
-      //   bio: bio,
-      //   profile: profile.file
-      // }
       const {data} = await axios.post(`http://localhost:5000/api/v1/auth/signup`, formData, config)
       dispatch(userExists(data.user))
       toast.success(data.message, {
@@ -141,7 +129,6 @@ const Login = ()=> {
                 }}
                 onSubmit={handleSubmit}>
                 <TextField 
-                  id="outlined-basic" 
                   label="Username" 
                   variant="outlined"
                   value={userName}
@@ -150,7 +137,6 @@ const Login = ()=> {
 
                 <TextField 
                   type='password'
-                  id="outlined-basic" 
                   label="Password" 
                   variant="outlined"
                   value={password}
@@ -182,25 +168,23 @@ const Login = ()=> {
             </>
           ) : (
             <>
-            <Typography variant='h5'>Sign Up</Typography>
+            <Typography variant='h5' marginBottom={"1rem"}>Sign Up</Typography>
             <form
             style={{
               width: "100%",
               display: "flex",
               flexDirection: "column",
-              padding: 4,
-              margin: "1rem"
             }}
              onSubmit={handleSignUp}>
 
               <Stack sx={{
                 position: "relative",
-                width: "10rem",
+                width: "8rem",
                 margin: "auto"
               }}>
                 <Avatar sx={{
-                  width: "10rem",
-                  height: "10rem",
+                  width: "8rem",
+                  height: "8rem",
                   objectFit: "contain"
                 }}
                 src={profile.preview}/>
@@ -282,23 +266,6 @@ const Login = ()=> {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   margin='normal'/>
-                  
-              {/* <FormControl sx={{
-                margin: "0.5rem 0 0 1rem"
-              }}>
-              <FormLabel>Gender</FormLabel>
-              <RadioGroup
-                row
-                defaultValue="female"
-                name="radio-buttons-group"
-                value={gender}
-                onChange={(e) => setGender(e.target.value)}
-              >
-                <FormControlLabel value="female" control={<Radio />} label="Female" />
-                <FormControlLabel value="male" control={<Radio />} label="Male" />
-                <FormControlLabel value="other" control={<Radio />} label="Other" />
-              </RadioGroup>
-            </FormControl> */}
 
             <Button
               variant='contained'
@@ -311,13 +278,12 @@ const Login = ()=> {
               Sign Up
             </Button>
             
-            <Typography textAlign={"center"} margin={"1rem 0 0.5rem 0"}>OR</Typography>
+            <Typography textAlign={"center"} marginTop={"0.5rem"}>OR</Typography>
 
             <Button onClick={toggleLogin}>
               Login Instead
             </Button>
             </form>
-            
             </>
           )}
         </Paper>

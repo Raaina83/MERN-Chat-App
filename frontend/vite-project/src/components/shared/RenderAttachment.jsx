@@ -3,7 +3,6 @@ import { transformImage } from '../../lib/features'
 import FileOpenIcon from '@mui/icons-material/FileOpen';
 
 const RenderAttachment = (file, url) => {
-  console.log(file)
   switch(file) {
     case "video": 
       return <video 
