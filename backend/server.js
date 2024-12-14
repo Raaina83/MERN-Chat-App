@@ -1,6 +1,6 @@
 import express from 'express'
 import dotenv from 'dotenv'
-dotenv.config()
+dotenv.config();
 import { createServer } from 'http'
 import {Server} from 'socket.io'
 import {v4} from 'uuid'
@@ -41,8 +41,6 @@ const io = new Server(server, {
 })
 
 
-
-dotenv.config()
 
 app.set("io", io)
 

@@ -9,7 +9,7 @@ import { TryCatch } from "../middleware/error.js";
 
 const getMyProfile = TryCatch(async(req, res, next) => {
     const user = await User.findById(req.user);
-  
+    console.log(req.user._id);
     if (!user) return next(new ErrorHandler("User not found", 404));
   
     res.status(200).json({
@@ -19,6 +19,7 @@ const getMyProfile = TryCatch(async(req, res, next) => {
 })
 
 const searchUser = TryCatch(async(req, res, next) => {
+    console.log(req.user._id);
     const {name = ""} = req.query
 
         const myChats = await Conversation.find({ groupChat: false, participants: req.user._id})

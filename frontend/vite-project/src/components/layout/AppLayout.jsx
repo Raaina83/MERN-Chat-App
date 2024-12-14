@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import Header from '../header/Header'
 import { Grid, Drawer, Skeleton } from '@mui/material'
@@ -15,7 +15,7 @@ import DeleteChatMenu from '../dialogs/DeleteChatMenu'
 import { Helmet } from 'react-helmet-async'
 
 const AppLayout = () => (WrappedComponent) => {
-    return (props) => {
+    return function WC(props) {
         const params = useParams()
         const chatId = params.chatId
         const socket = getSocket()

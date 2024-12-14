@@ -38,6 +38,7 @@ function App() {
         <Route path="/" element={ <Home/>}></Route>
         <Route path="/chat/:chatId" element={<Chat />} />
         <Route path="/group" element={<Group></Group>}></Route>
+        
       </Route>
 
       <Route
