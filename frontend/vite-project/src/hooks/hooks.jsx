@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
-import useConversation from '../zustand/useConversation'
 
 const useErrors = (errors = []) => {
     useEffect(() => {

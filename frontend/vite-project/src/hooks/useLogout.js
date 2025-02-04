@@ -1,9 +1,7 @@
 import { useState } from "react"
-// import { useAuthContext } from "../context/AuthContext"
 import toast from "react-hot-toast"
-import useConversation from "../zustand/useConversation"
 import { useDispatch } from "react-redux"
-import { userExists, userNotExists } from "../redux/reducers/auth"
+import {  userNotExists } from "../redux/reducers/auth"
 
 const useLogout = () =>{
     const [loading, setLoading] = useState(false)

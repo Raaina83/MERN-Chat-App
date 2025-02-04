@@ -9,6 +9,7 @@ import { useDispatch } from 'react-redux';
 import CameraAltIcon from '@mui/icons-material/CameraAlt';
 import { VisuallyHiddenInput } from '../../components/styles/StylesComponents.jsx';
 import { useFileHandler} from '6pp'
+import { server } from '../../constants/config.js';
 
 const Login = ()=> {
   const [isLogin, setIsLogin] = useState(true)
@@ -40,7 +41,7 @@ const Login = ()=> {
     
         try {
           const { data } = await axios.post(
-            `http://localhost:5000/api/v1/auth/login`,
+            `${server}/api/v1/auth/login`,
             {
               userName,
               password,
@@ -83,7 +84,7 @@ const Login = ()=> {
     formData.append("profile", profile.file)
     console.log("form",formData)
     try {
-      const {data} = await axios.post(`http://localhost:5000/api/v1/auth/signup`, formData, config)
+      const {data} = await axios.post(`${server}/api/v1/auth/signup`, formData, config)
       dispatch(userExists(data.user))
       toast.success(data.message, {
         id: toastId

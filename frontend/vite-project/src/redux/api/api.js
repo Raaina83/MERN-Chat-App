@@ -1,8 +1,9 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { server } from "../../constants/config";
 
 const api = createApi({
     reducerPath: "api",
-    baseQuery: fetchBaseQuery({baseUrl: 'http://localhost:5000/api/v1/'}), //by default has the behaviour of caching hence we need to provide tags so later when we are just getting cached data we can refecth when changes in data occur
+    baseQuery: fetchBaseQuery({baseUrl: `${server}/api/v1/`}), //by default has the behaviour of caching hence we need to provide tags so later when we are just getting cached data we can refecth when changes in data occur
     tagTypes: ["Chat", "User", "Message"],
     endpoints: (builder) => ({
         myChats: builder.query({

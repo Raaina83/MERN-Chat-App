@@ -1,6 +1,5 @@
 import { useState } from "react"
 import toast from "react-hot-toast";
-import { useAuthContext } from "../context/AuthContext";
 import { useDispatch } from "react-redux";
 import { userExists, userNotExists } from "../redux/reducers/auth";
 

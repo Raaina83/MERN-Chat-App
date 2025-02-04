@@ -2,6 +2,7 @@ import { ZegoUIKitPrebuilt } from '@zegocloud/zego-uikit-prebuilt';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { server } from '../../constants/config';
 // import { setIsCallAccepted, setIsCallActive, setToken } from '../../redux/reducers/misc';
 
 
@@ -34,7 +35,7 @@ function VideoCall() {
   const roomID = getUrlParams().get('roomID') || randomID(5);
   let myMeeting = (element) => {
     const initialize = async() => {
-      const {data} = await axios.get(`http://localhost:5000/api/v1/auth/generate-token/${user._id}`, {withCredentials: true});
+      const {data} = await axios.get(`${server}/api/v1/auth/generate-token/${user._id}`, {withCredentials: true});
       const token = data.zego_token;
       const kitToken = ZegoUIKitPrebuilt.generateKitTokenForProduction(data.appId, token, roomID, user._id, user.username);
       const zp = ZegoUIKitPrebuilt.create(kitToken);

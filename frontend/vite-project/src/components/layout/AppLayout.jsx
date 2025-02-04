@@ -14,6 +14,7 @@ import { getOrSaveFromStorage } from '../../lib/features'
 import DeleteChatMenu from '../dialogs/DeleteChatMenu'
 import { Helmet } from 'react-helmet-async'
 import axios from 'axios'
+import { server } from '../../constants/config'
 
 function randomID(len) {
   let result = '';
@@ -82,7 +83,7 @@ const AppLayout = () => (WrappedComponent) => {
               console.log("callId",callId);
               socket.emit('sending-roomID', {roomID, toUserId, fromUser: user._id});
               try {
-                const {data} = await axios.get(`http://localhost:5000/api/v1/auth/generate-token/${user._id}`, {withCredentials: true});
+                const {data} = await axios.get(`${server}/api/v1/auth/generate-token/${user._id}`, {withCredentials: true});
                 const token = data.zego_token;
                 console.log("token--->", token);
                 dispatch(setToken(token))
