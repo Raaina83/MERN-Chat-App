@@ -55,7 +55,10 @@ const validateHandlor = (req,res, next) => {
 
     if(errors.isEmpty()) return next()
 
-    else next(new ErrorHandler(errorMsgs, 400))
+    else {
+        console.log(errorMsgs);
+        next(new ErrorHandler(errorMsgs, 400))
+    }
 }
 
 export {

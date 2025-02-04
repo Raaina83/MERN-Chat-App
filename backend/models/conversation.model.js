@@ -8,7 +8,6 @@ const conversationSchema = new Schema({
     profile: {
         url: {
             type: String,
-            required: true
         }
     },
     groupChat: {

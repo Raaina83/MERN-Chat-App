@@ -13,7 +13,6 @@ const emitEvent = (req, event, users, data) => {
 }
 
 const uploadFilesToCloudinary = async(files=[]) => {
-    console.log("files-->",files)
     const uploadPromises = files.map((file) => {
         return new Promise((resolve, reject) => {
             cloudinary.uploader.upload(

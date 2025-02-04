@@ -1,4 +1,3 @@
-import React, { Suspense } from 'react'
 import { IoMdAdd } from "react-icons/io";
 import { FaUserGroup } from "react-icons/fa6";
 import { FaSearch } from "react-icons/fa";
@@ -6,7 +5,7 @@ import { FiLogOut } from "react-icons/fi";
 import { FaBars } from "react-icons/fa6";
 import { useNavigate } from 'react-router-dom';
 import SearchDialog from '../specific/SearchDialog';
-import { Backdrop, Badge, IconButton, Tooltip } from '@mui/material';
+import { Backdrop, Badge, Box, IconButton, Tooltip } from '@mui/material';
 import Notification from './Notification'
 import NewGroup from './NewGroup';
 import { setIsMobileMenu, setIsNotification, setIsSearch, setIsNewGroup } from '../../redux/reducers/misc';
@@ -17,7 +16,7 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import { userNotExists } from '../../redux/reducers/auth';
 import api from '../../redux/api/api';
-import { Helmet } from 'react-helmet-async';
+import { Suspense } from "react";
 
 
 function Header() {
@@ -64,24 +63,47 @@ function Header() {
       <div className='w-[50%] h-[10vh] text-xl hidden font-medium sm:flex items-center justify-start ms-8'>
         Chat App
       </div>
+
       <div className='flex sm:hidden justify-start w-[50%] h-[10vh] items-center px-4 '>
         <IconButton onClick={handleMobile}>
         <FaBars className=' size-6 cursor-pointer' />
         </IconButton>
       </div>
+
       <div className='w-[50%] h-[10vh]'>
         <div className='flex justify-end items-center h-[100%]'>
-          <div className='px-4'><FaSearch className='h-6 w-6 cursor-pointer' onClick={openSearch}/></div>
-          <div className='px-4 '>
-             <IconBtn 
-             title={"Notifications"}
-             icon={<NotificationsIcon/>}
-             onClick={openNotification}
-             value={notificationsCount}></IconBtn>
+          <div className='px-4'>
+            <FaSearch className='h-6 w-6 cursor-pointer' onClick={openSearch}/>
           </div>
-          <div className='px-4'><IoMdAdd className='h-6 w-6 cursor-pointer' onClick={openNewGroup}/></div>
+
+          <div className='px-2'>
+            <IconBtn 
+            title={"Notifications"}
+            icon={<NotificationsIcon/>}
+            onClick={openNotification}
+            value={notificationsCount}></IconBtn>
+          </div>
+          <div className='px-2'>
+            <IconBtn 
+            title={"New Group"}
+            icon={<IoMdAdd/>}
+            onClick={openNewGroup}></IconBtn>
+          </div>
+          <div className='px-2'>
+            <IconBtn 
+            title={"Groups"}
+            icon={<FaUserGroup/>}
+            onClick={navigateToGroup}></IconBtn>
+          </div>
+          <div className='px-2'>
+            <IconBtn 
+            title={"Logout"}
+            icon={<FiLogOut/>}
+            onClick={logoutHandler}></IconBtn>
+          </div>
+          {/* <div className='px-4'><IoMdAdd className='h-6 w-6 cursor-pointer' onClick={openNewGroup}/></div>
           <div className='px-4' ><FaUserGroup className='h-6 w-6 cursor-pointer' onClick={navigateToGroup}/></div>
-          <div className='px-4' ><FiLogOut className='h-6 w-6 me-4 cursor-pointer' onClick={logoutHandler}/></div> 
+          <div className='px-4' ><FiLogOut className='h-6 w-6 me-4 cursor-pointer' onClick={logoutHandler}/></div>  */}
         </div>
         </div>
         {isSearch && (
@@ -100,7 +122,6 @@ function Header() {
           </Suspense>
         )}
     </div>
-
   )
 }
 

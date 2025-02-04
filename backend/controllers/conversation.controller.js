@@ -78,7 +78,7 @@ const getMyGroups = TryCatch(async(req, res, next) => {
         // participants,
         fullName,
         groupChat,
-        profile: profile.url
+        // profile: profile.url || profile
     }))
 
     return res.status(201).json({ 
@@ -280,11 +280,18 @@ const getChatDetails = TryCatch(async(req, res, next) =>{
             return next(ErrorHandler("Chat not found", 404))
         }
 
-        chat.participants = chat.participants.map((_id, fullName, profile) => ({
-            _id,
-            fullName,
-            profile: profile.url
-        }))
+        // chat.participants = chat.participants.map((participant) => (console.log(participant)))
+        // chat.participants = chat.participants.map((participant) => ({
+        //     profile: participant.profile,
+        //     fullName: participant.fullName,
+        //     _id: participant._id
+        // }))
+
+        // chat.participants = chat.participants.map(({_id, fullName, profile}) => ({
+        //     _id,
+        //     fullName,
+        //     profile: profile.url
+        // }))
 
         return res.status(200).json({
             success: true,
@@ -387,6 +394,7 @@ const getMessages = TryCatch(async(req, res, next) => {
                 .skip(skip)
                 .limit(resultPerPage)
                 .populate("senderId", "fullName profile")
+                .populate("chat", "groupChat")
                 .lean(),
             Message.countDocuments({ chat: chatId })
         ])

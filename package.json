@@ -13,6 +13,7 @@
   "license": "ISC",
   "dependencies": {
     "@reduxjs/toolkit": "^2.2.3",
+    "@zegocloud/zego-uikit-prebuilt": "^2.14.1",
     "6pp": "^1.2.16",
     "axios": "^1.6.8",
     "bcryptjs": "^2.4.3",

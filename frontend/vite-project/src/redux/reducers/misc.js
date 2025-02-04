@@ -13,6 +13,12 @@ const initialState = {
         groupChat: false
     },
     uploadingLoader: false,
+    inComingCall: null,
+    isCallActive: false,
+    callId: null,
+    iscallAccepted: false,
+    isEndCall: false,
+    kitToken: undefined
 }
 
 const miscSlice = createSlice({
@@ -45,7 +51,25 @@ const miscSlice = createSlice({
         },
         setUploadingLoader: (state, action) => {
             state.uploadingLoader = action.payload
-        }
+        },
+        setInComingCall: (state, action) => {
+            state.inComingCall = action.payload
+        },
+        setIsCallActive: (state, action) => {
+            state.isCallActive = action.payload
+        },
+        setCallId: (state, action) => {
+            state.callId = action.payload
+        },
+        setIsCallAccepted: (state, action) => {
+            state.iscallAccepted = action.payload
+        },
+        setIsEndCall: (state, action) => {
+            state.isEndCall = action.payload;
+        },
+        setToken: (state, action) => {
+            state.kitToken = action.payload;
+        },
     }
 })
 
@@ -61,4 +85,10 @@ export const {
     setIsSelectedDeleteChat,
     setIsFileMenu,
     setUploadingLoader,
+    setInComingCall,
+    setIsCallActive,
+    setCallId,
+    setIsCallAccepted,
+    setIsEndCall,
+    setToken
 }  = miscSlice.actions

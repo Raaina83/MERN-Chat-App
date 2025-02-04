@@ -1,6 +1,6 @@
 import {User} from  "../models/user.model.js";
 import bcrypt from  "bcryptjs";
-import {generateTokenAndCookie}  from "../utils/generateToken.js";
+import {generateToken04, generateTokenAndCookie}  from "../utils/generateToken.js";
 import { ErrorHandler } from "../utils/utility.js";
 import { cookieOptions, uploadFilesToCloudinary } from "../utils/features.js";
 import { TryCatch } from "../middleware/error.js";
@@ -32,15 +32,16 @@ const signup = TryCatch(async(req, res, next) => {
     if(bio === ""){
         bio = "New User"
     }
+
+    if(password !== confirmPassword){
+        return next(new ErrorHandler("Passwords does not match", 400))
+    }
+    
     const file = req.file;
 
     if(!file) return next(new ErrorHandler("Please upload profile"))
 
     const result = await uploadFilesToCloudinary([file])
-
-    if(password !== confirmPassword){
-        return next(new ErrorHandler("Passwords does not match", 400))
-    }
 
     const profile = {
         public_id: result[0].public_id,
@@ -83,8 +84,25 @@ const logout = TryCatch(async(req, res, next) => {
         })
 })
 
+const getToken = TryCatch(async(req, res, next) => {
+    const appId = process.env.ZEGO_APPID;
+    const serverSecret = process.env.ZEGO_SERVER_SECRET;
+    const userId = req.user._id;
+    const effectiveTime = 3600;
+    const payload = "";
+    if(appId && serverSecret && userId) {
+        const token = generateToken04(parseInt(appId), userId.toString(), serverSecret, effectiveTime, payload);
+        return res.status(200).json({
+            appId,
+            zego_token: token,
+        })
+    }
+    return res.status(400).send("credentials required");
+})
+
 export {
     login,
     signup,
-    logout
+    logout,
+    getToken
 }

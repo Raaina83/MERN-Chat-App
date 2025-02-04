@@ -6,26 +6,12 @@ import { Provider } from 'react-redux'
 import store from './redux/store.js'
 import { CssBaseline } from '@mui/material'
 import {HelmetProvider} from 'react-helmet-async'
-
-// const router = createBrowserRouter([
-//   {
-//     path: '/',
-//     element: <Home/>
-//   },
-//   {
-//     path: '/login',
-//     element: <Login/>
-//   },
-//   {
-//     path: '/signup',
-//     element: <Signup/>
-//   }
-// ])
-
+import { VideoCallProvider } from './context/VideoCallContext.jsx'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <Provider store={store}>
+    <VideoCallProvider>
     <HelmetProvider>
     <CssBaseline>
     {/* <div onContextMenu={(e) => e.preventDefault()}> */}
@@ -33,6 +19,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     {/* </div>    */}
     </CssBaseline>
     </HelmetProvider>
+    </VideoCallProvider>
     </Provider>
   </React.StrictMode>,
 )

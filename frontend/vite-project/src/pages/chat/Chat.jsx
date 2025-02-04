@@ -1,7 +1,6 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import  { useCallback, useEffect, useRef, useState } from 'react'
 import AppLayout from '../../components/layout/AppLayout'
-import Message from '../../components/messages/Message.jsx'
-import { IconButton, Skeleton, Stack, Typography } from '@mui/material'
+import { IconButton, Skeleton, Stack } from '@mui/material'
 import { getSocket } from '../../socket.jsx'
 import { ALERT, CHAT_JOINED, CHAT_LEAVED, NEW_MESSAGE, START_TYPING, STOP_TYPING } from '../../constants/events.js'
 import { useChatDetailsQuery, useGetAllMessagesQuery } from '../../redux/api/api.js'
@@ -15,6 +14,7 @@ import AttachFileIcon from '@mui/icons-material/AttachFile';
 import SendIcon from '@mui/icons-material/Send';
 import FileMenu from '../../components/dialogs/FileMenu.jsx'
 import { setIsFileMenu } from '../../redux/reducers/misc.js'
+import MessageList from '../../components/messages/MessageList.jsx'
 
 const Chat= ({chatId, user}) => {
   const containerRef = useRef(null)
@@ -161,10 +161,11 @@ const Chat= ({chatId, user}) => {
     <Stack ref={containerRef} height={"90%"} 
     sx={{
       overflowX: "hidden",
-      overflowY: "auto"
+      overflowY: "auto",
     }}>
 
-      {allMessages.map((message) => <Message message={message} key={message._id}/>)}
+      <MessageList messages={allMessages} chatId={chatId}></MessageList>
+      {/* {allMessages.map((message) => <Message message={message} key={message._id}/>)} */}
 
         {userTyping && <TypingLoader/>}
 

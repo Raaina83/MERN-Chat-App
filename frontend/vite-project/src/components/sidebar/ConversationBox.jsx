@@ -22,7 +22,6 @@ function ConversationBox({
         )
 
         const isOnline = data?.participants?.some((member) => onlineUsers.includes(member))
-        console.log("isonlinme",isOnline)
 
         return (<ChatItem 
           name= {data.name[0]}

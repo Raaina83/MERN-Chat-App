@@ -47,7 +47,7 @@ app.set("io", io)
 app.use(express.json()); //to parse the incoming request with JSON payloads from req.body
 app.use(cookieParser());
 app.use(cors({
-    origin: ["http://localhost:5173", "http://localhost:5000"], 
+    origin: ["http://localhost:5173", "http://localhost:5174"], 
     credentials: true
 }))
 
@@ -69,9 +69,31 @@ io.use((socket, next) => {
 
 io.on("connection", (socket) => {
     const user = socket.user
-    // console.log(user)
+    console.log(`${user.fullName}user connected with -->`,socket.id);
 
     userSocketIDs.set(user._id.toString(), socket.id)
+
+    socket.on('call-user', async({targetUserId, userId, callId}) => {
+        const userToCall = getSockets([targetUserId]);
+        console.log("call user-->", userToCall, userId, targetUserId);
+        io.to(userToCall).emit('call-received', { fromUserId: userId , callId});
+    })
+
+    socket.on('accept-call', ({ fromUserId, toUserId, callId}) => {
+        const userCalling = getSockets([fromUserId]);
+        console.log("userCalling-->",userCalling, fromUserId, toUserId);
+        io.to(userCalling).emit('call-accepted', { fromUserId, toUserId, callId}); 
+      });
+    
+    socket.on('reject-call', ({ fromUserId }) => {
+        const userCalling = getSockets([fromUserId]);
+        io.to(userCalling).emit('call-rejected');
+    });
+
+    socket.on('sending-roomID', ({roomID, toUserId, fromUser}) => {
+        const socketUser = getSockets([toUserId]);
+        io.to(socketUser).emit('received-roomID', {roomID});
+    })
 
     socket.on(NEW_MESSAGE, async({chatId, participants, message}) => {
         const messageRealTime = {
@@ -108,14 +130,12 @@ io.on("connection", (socket) => {
     })
 
     socket.on(START_TYPING, ({participants, chatId}) => {
-        console.log("start-typing", chatId)
 
         const membersSocket = getSockets(participants)
         socket.to(membersSocket).emit(START_TYPING, {chatId})
     })
 
     socket.on(STOP_TYPING, ({participants, chatId}) => {
-        console.log("stop typing", chatId)
 
         const membersSocket = getSockets(participants)
         socket.to(membersSocket).emit(STOP_TYPING, {chatId})

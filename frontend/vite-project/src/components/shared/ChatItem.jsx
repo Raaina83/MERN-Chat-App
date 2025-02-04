@@ -1,8 +1,9 @@
-import { Box, Stack, Typography } from '@mui/material'
-import React, { memo } from 'react'
+import { Box, Typography } from '@mui/material'
+import { memo } from 'react'
 import { Link } from 'react-router-dom'
-import useConversation from '../../zustand/useConversation'
 import { motion } from "framer-motion"
+// import { io } from 'socket.io-client';
+// const socket = io('http://localhost:3001');
 
 function ChatItem({
     name, 
@@ -15,7 +16,7 @@ function ChatItem({
     index = 0,
     handleDeleteChat
 }) {
-  
+
   return (
     <Link 
         sx={{
@@ -47,6 +48,8 @@ function ChatItem({
                   </div>
               </div>
           </div>
+
+        
 
           {isOnline && (
           <Box

@@ -1,21 +1,19 @@
-import React from 'react'
 import { extractTime } from '../../utils/extractTime';
 import { useSelector } from 'react-redux';
-import { motion } from "framer-motion"
 import {Box, Stack, Typography} from '@mui/material'
 import { fileFormat } from '../../lib/features';
 import RenderAttachment from '../shared/RenderAttachment';
 
 function Message({message}) {
     const {user} = useSelector(state => state.auth)
-    const formattedTime = extractTime(message.createdAt);
-    const fromMe = user._id === message.senderId._id;
-    const chatClassName = fromMe ? "chat-end" : "chat-start";
-    // const name = fromMe ? user.fullName : message.senderId.fullName;
+    const formattedTime = extractTime(message.createdAt)
+    const fromMe = user._id === message.senderId._id
+    const isGroupChat = message.chat.groupChat
+    const chatClassName = fromMe ? "chat-end" : "chat-start"
 
   return (
     <>
-    <motion.div className={`chat ${chatClassName}`}
+    <div className={`chat ${chatClassName}`}
     style={{
         backgroundColor: "#F9F8F8",
         alignSelf: fromMe ? "flex-end" : "flex-start",
@@ -28,11 +26,12 @@ function Message({message}) {
         maxWidth: "50%",
         alignItems: "flex-end"
     }}
-    initial={{opacity: 0, x: "-100%"}}
-    whileInView={{opacity: 1, x: 0}}
+    // initial={{opacity: 0, x: "-100%"}}
+    // whileInView={{opacity: 1, x: 0}}
     >
-        <Stack>
-         <Typography variant='h6'>{message.message}</Typography>
+        <Stack sx={{display: 'flex'}}>
+            {isGroupChat && <Typography sx={{fontSize: 13}}>{message.senderId.fullName}</Typography>}
+            <Typography variant='h6'>{message.message}</Typography>
         </Stack>
          
 
@@ -50,7 +49,7 @@ function Message({message}) {
         }))}
 
         <Typography variant='caption'>{formattedTime}</Typography>
-    </motion.div>
+    </div>
 
 </>
   )
