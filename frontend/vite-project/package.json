@@ -15,6 +15,7 @@
     "@mui/icons-material": "^5.15.15",
     "@mui/material": "^5.15.15",
     "@reduxjs/toolkit": "^2.5.1",
+    "@zegocloud/zego-uikit-prebuilt": "^2.14.1",
     "6pp": "^1.2.16",
     "axios": "^1.6.8",
     "date-fns": "^4.1.0",
