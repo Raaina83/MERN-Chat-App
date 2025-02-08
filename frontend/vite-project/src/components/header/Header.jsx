@@ -17,6 +17,7 @@ import toast from 'react-hot-toast';
 import { userNotExists } from '../../redux/reducers/auth';
 import api from '../../redux/api/api';
 import { Suspense } from "react";
+import { server } from "../../constants/config";
 
 
 function Header() {
@@ -29,7 +30,7 @@ function Header() {
 
   const logoutHandler = async() => {
     try {
-      const {data} = await axios.get(`http://localhost:5000/api/v1/auth/logout`, {
+      const {data} = await axios.get(`${server}/api/v1/auth/logout`, {
         withCredentials: true
       })
       dispatch(userNotExists())
