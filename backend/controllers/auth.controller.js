@@ -9,28 +9,29 @@ import { cookieOptions, uploadFilesToCloudinary } from "../utils/features.js";
 import { TryCatch } from "../middleware/error.js";
 import nodemailer from "nodemailer";
 import { UserOTPVerification } from "../models/userOTPverification.model.js";
+import dotenv from "dotenv";
+dotenv.config();
 
 // Create a test account or replace with real credentials.
 const transporter = nodemailer.createTransport({
-  host: "smtp.ethereal.email",
-  port: 587,
+  host: "smtp.gmail.com",
+  port: 465,
   auth: {
-    user: "vincenza.lindgren24@ethereal.email",
-    pass: "M72FtN6wHUVaPp5QQW",
+    user: `${process.env.EMAIL}`,
+    pass: `${process.env.EMAIL_APP_PASSWORD}`,
   },
 });
 
 // Wrap in an async IIFE so we can use await.
 const sendMail = TryCatch(async ({ _id, email }, res) => {
   const otp = `${Math.floor(1000 + Math.random() * 9000)}`;
-  console.log("opt-->", { otp, _id, email });
 
   const mailOptions = {
-    from: '"Maddison Foo Koch" <vincenza.lindgren24@ethereal.email>',
+    from: `"Raaina Whalla" <${process.env.EMAIL}>`,
     to: `${email}`,
     subject: "Verify your email",
-    text: "Hello world?", // plain‑text body
-    html: `<b>${otp}</b>`, // HTML body
+    // text: "Hello world?", // plain‑text body
+    html: `<p>OTP for your verification is <b>${otp}</b></p>`, // HTML body
   };
 
   //hash the otp
@@ -45,10 +46,17 @@ const sendMail = TryCatch(async ({ _id, email }, res) => {
   });
 
   await newOTPverification.save();
-  const info = await transporter.sendMail(mailOptions);
-  console.log("Message sent:", info.messageId);
+  const info = await transporter.sendMail(mailOptions, (err, info) => {
+    if (err) {
+      console.error(err);
+      return next(new ErrorHandler(err.message));
+    } else {
+      return info;
+    }
+  });
 
   res.json({
+    success: true,
     status: "PENDING",
     message: "Verification otp mail sent",
     data: {
@@ -91,21 +99,27 @@ const signup = TryCatch(async (req, res, next) => {
     return next(new ErrorHandler("Passwords does not match", 400));
   }
 
-  //   const file = req.file;
+  const file = req.file;
 
-  //   if (!file) return next(new ErrorHandler("Please upload profile"));
+  if (!file) return next(new ErrorHandler("Please upload profile"));
 
-  //   const result = await uploadFilesToCloudinary([file]);
+  const result = await uploadFilesToCloudinary([file]);
 
-  //   const profile = {
-  //     public_id: result[0].public_id,
-  //     url: result[0].url,
-  //   };
+  const profile = {
+    public_id: result[0].public_id,
+    url: result[0].url,
+  };
 
   const user = await User.findOne({ userName });
 
   if (user) {
-    return next(new ErrorHandler("User already exists", 400));
+    if (user.active) return next(new ErrorHandler("User already exists", 400));
+    else {
+      await UserOTPVerification.deleteMany({ userId: user._id });
+      await sendMail({ _id: user._id, email: user.email });
+
+      return;
+    }
   }
 
   const salt = await bcrypt.genSalt(10);
@@ -118,7 +132,7 @@ const signup = TryCatch(async (req, res, next) => {
     userName: userName,
     password: hashedPassword,
     email: email,
-    // profile: profile,
+    profile: profile,
     bio: bio,
     active: false,
   });
@@ -126,9 +140,6 @@ const signup = TryCatch(async (req, res, next) => {
   await newUser.save().then((result) => {
     sendMail(result, res);
   });
-  // .then(() => {
-  //   generateTokenAndCookie(newUser, res, "User created");
-  // });
 
   //   generateTokenAndCookie(newUser, res, "User created");
 });
@@ -202,13 +213,16 @@ const VerifyOTP = TryCatch(async (req, res, next) => {
           return next(new ErrorHandler("Invalid OTP", 400));
         } else {
           //activate the user
+          const newUser = await User.findById(userId);
           await User.updateMany({ _id: userId }, { active: true });
           await UserOTPVerification.deleteMany({ userId });
 
-          res.json({
-            status: "VERIFIED",
-            message: "User has been verified successfully",
-          });
+          generateTokenAndCookie(newUser, res, "User VERIFIED");
+
+          // res.json({
+          //   status: "VERIFIED",
+          //   message: "User has been verified successfully",
+          // });
         }
       }
     }

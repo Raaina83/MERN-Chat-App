@@ -21,16 +21,16 @@ const userSchema = new Schema(
       type: String,
       required: true,
     },
-    // profile: {
-    //   public_id: {
-    //     type: String,
-    //     required: true,
-    //   },
-    //   url: {
-    //     type: String,
-    //     required: true,
-    //   },
-    // },
+    profile: {
+      public_id: {
+        type: String,
+        required: true,
+      },
+      url: {
+        type: String,
+        required: true,
+      },
+    },
     bio: {
       type: String,
       maxlength: 100,
