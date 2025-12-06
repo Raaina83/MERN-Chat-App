@@ -55,7 +55,7 @@ const sendMail = TryCatch(async ({ _id, email }, res) => {
     }
   });
 
-  res.json({
+  return res.json({
     success: true,
     status: "PENDING",
     message: "Verification otp mail sent",
@@ -87,8 +87,25 @@ const login = TryCatch(async (req, res, next) => {
 });
 
 const signup = TryCatch(async (req, res, next) => {
-  const { fullName, userName, password, confirmPassword, email, bio } =
-    req.body;
+  const { fullName, userName, password, confirmPassword, email } = req.body;
+
+  let { bio } = req.body;
+  const user = await User.findOne({ userName });
+  if (user) {
+    if (user.active) {
+      console.log("inside veirfied user");
+      return res.status(400).json({
+        success: false,
+        message: "User already exists. Please try to sign in instead",
+      });
+    } else {
+      await UserOTPVerification.deleteMany({ userId: user._id });
+      await sendMail({ _id: user._id, email: user.email }, res);
+
+      return;
+    }
+  }
+
   if (password.length < 6)
     return next(new ErrorHandler("Password should have at least 6 digits."));
   if (bio === "") {
@@ -109,18 +126,6 @@ const signup = TryCatch(async (req, res, next) => {
     public_id: result[0].public_id,
     url: result[0].url,
   };
-
-  const user = await User.findOne({ userName });
-
-  if (user) {
-    if (user.active) return next(new ErrorHandler("User already exists", 400));
-    else {
-      await UserOTPVerification.deleteMany({ userId: user._id });
-      await sendMail({ _id: user._id, email: user.email });
-
-      return;
-    }
-  }
 
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(password, salt);
