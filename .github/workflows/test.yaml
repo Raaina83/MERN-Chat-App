@@ -1,8 +1,24 @@
-name: Test Workflow
+# name: Test Workflow
+# on: [push, workflow_dispatch]
+# jobs:
+#   build:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Say Hello
+#         run: echo "Hello, PulseDev!"
+
+name: Trigger Failure Alert
 on: [push, workflow_dispatch]
+
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Say Hello
-        run: echo "Hello, PulseDev!"
+      - name: Prepare Deployment
+        run: echo "Initializing deployment pipeline..."
+
+      - name: Force Failure
+        run: |
+          echo "Error: Critical database connection failure detected!"
+          echo "Failing this run intentionally to trigger a PulseDev alert."
+          exit 1 # <--- This forces the build to fail
