@@ -1,0 +1,20 @@
+services:
+  # mongodb:
+  #   image: mongo
+  #   container_name: mongodb
+  #   ports:
+  #     - "27017:27017"
+  #   volumes:
+  #     # - .:/app
+  #     - mongodb_data:/data/db
+
+  backend:
+    image: backend
+    container_name: chat_app
+    ports:
+      - "8000:8000"
+    environment:
+      - MONGO_URI=mongodb+srv://raainawhalla:Vihfq7Cgu5roCA5S@cluster0.or5jsxw.mongodb.net/mern-chat-app?retryWrites=true&w=majority&tls=true
+      - PORT=8000
+      - JWT_SECRET=mz2Bl/jl1ARxFO74LE6741xhxDJkNwgru7Tql9RwJDI=
+      - NODE_ENV=DEVELOPMENT

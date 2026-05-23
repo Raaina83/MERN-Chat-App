@@ -25,7 +25,7 @@ function App() {
       .then(({ data }) => {
         dispatch(userExists(data));
       })
-      .catch((err) => dispatch(userNotExists()));
+      .catch(() => dispatch(userNotExists()));
   }, [dispatch]);
 
   if (loader) return <LayoutLoader />;

@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "server": "SET NODE_ENV=DEVELOPMENT && nodemon backend/server.js",
-    "start": "SET NODE_ENV=PRODUCTION && node backend/server.js"
+    "start": "SET NODE_ENV=PRODUCTION && node server.js"
   },
   "keywords": [],
   "author": "",
